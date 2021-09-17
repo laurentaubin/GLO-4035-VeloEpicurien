@@ -15,4 +15,6 @@ class TestHeartbeatResource(TestCase):
 
         actual_heartbeat_dto = self.heartbeat_resource.send_heartbeat()
 
-        self.assertEqual(actual_heartbeat_dto.get_city(), expected_heartbeat_dto.get_city())
+        self.assertEqual(
+            actual_heartbeat_dto.get_city(), expected_heartbeat_dto.get_city()
+        )

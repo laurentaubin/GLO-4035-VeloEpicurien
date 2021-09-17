@@ -6,6 +6,4 @@ class HeartbeatDto:
         return self.__city
 
     def to_dict(self) -> dict:
-        return {
-            "villeChoisie": self.__city
-        }
+        return {"villeChoisie": self.__city}

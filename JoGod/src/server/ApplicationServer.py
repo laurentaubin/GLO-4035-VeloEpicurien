@@ -7,9 +7,8 @@ class ApplicationServer:
     def __init__(self, heartbeat_resource: HeartbeatResource):
         self.__heartbeat_resource = heartbeat_resource
 
-
         self.__app = Flask(__name__)
-        self.__app.config['JSON_AS_ASCII'] = False
+        self.__app.config["JSON_AS_ASCII"] = False
         self.__app.add_url_rule("/heartbeat", "heartbeat", self.__send_heartbeat)
 
     def run(self, hostname):
