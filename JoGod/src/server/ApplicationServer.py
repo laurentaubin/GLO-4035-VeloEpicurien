@@ -12,7 +12,7 @@ class ApplicationServer:
         self.__app.add_url_rule("/heartbeat", "heartbeat", self.__send_heartbeat)
 
     def run(self):
-        self.__app.run()
+        self.__app.run("0.0.0.0")
 
     def __send_heartbeat(self):
         return self.__heartbeat_resource.send_heartbeat().to_dict()

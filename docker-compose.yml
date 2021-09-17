@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  jogod:
+    container_name:
+      jogod
+    restart: always
+    build: ./JoGod/
+    ports:
+      - "80:5000"
+    volumes:
+      - ./JoGod/src:/app/src
+
+  mongo:
+    image: mongo:4.2.0
+    container_name:
+      mongo_epicurien_tbd
+    environment:
+      - MONGO_INITDB_DATABASE=epicurien-tbd
+    volumes:
+      - ./mongo-volume:/data/db
+
+  neo4j:
+    image: neo4j:4.2.0
+    container_name:
+      neo4j_epicurien_tbd
+    volumes:
+      - ./neo4j/plugins:/plugins
+    environment:
+      NEO4J_AUTH: neo4j/streams
+      NEO4J_dbms_logs_debug_level: DEBUG
+      # KAFKA related configuration
+      NEO4J_kafka_bootstrap_servers: kafka:19092
+      NEO4J_streams_source_topic_nodes_neo4j: Person{*}
+      NEO4J_streams_source_topic_relationships_neo4j: KNOWS{*}
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    container_name: zookeeper_epicurien_tbd
+    ports:
+      - "12181:12181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 12181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka
+    container_name: kafka_epicurien_tbd
+    ports:
+      - "19092:19092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:12181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:19092
