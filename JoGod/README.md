@@ -24,9 +24,6 @@ All the dependencies should be installed and the app is ready to run.
 
 To deactivate the virtual environment, run ```deactivate``` in your command line.
 
-#### Configure communication between station and robot
-Make sure the station's IP address is correctly set in the robot's config file. See `covirondelle-robot`'s README for further information.
-
 #### Run the app
 ```bash
 make run
