@@ -2,9 +2,9 @@
 
 ## App structure
 ### Services
-| Name  | Role        |
+| Name  | Description        |
 |-------|-------------|
-| JoGod | Api Gateway |
+| [JoGod](JoGod) | Python Api Gateway |
 
 ## Getting started
 Follow these instructions to get a copy of the project up and running on your local machine
@@ -26,3 +26,8 @@ Additionally, you can do both at the same time:
 ```bash
 docker-compose up --build
 ```
+
+## Contributors
+- Laurent Aubin
+- Toma Gagné
+- Maxime Nasso
