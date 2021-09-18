@@ -11,8 +11,8 @@ class ApplicationServer:
         self.__app.config["JSON_AS_ASCII"] = False
         self.__app.add_url_rule("/heartbeat", "heartbeat", self.__send_heartbeat)
 
-    def run(self, hostname):
+    def run(self, hostname) -> None:
         self.__app.run(hostname)
 
-    def __send_heartbeat(self):
+    def __send_heartbeat(self) -> dict:
         return self.__heartbeat_resource.send_heartbeat().to_dict()

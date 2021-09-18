@@ -10,6 +10,6 @@ class Context:
     def run(self):
         self.__application_server.run(Config.BASE_HOSTNAME)
 
-    def __create_application_server(self):
+    def __create_application_server(self) -> ApplicationServer:
         heartbeat_resource = HeartbeatResource(Config.CHOSEN_CITY)
         return ApplicationServer(heartbeat_resource)
