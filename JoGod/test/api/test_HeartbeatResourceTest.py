@@ -12,6 +12,4 @@ class TestHeartbeatResource(TestCase):
     def test_givenCity_whenSendHeartbeat_thenReturnHeartbeatDtoWithCity(self):
         actual_heartbeat_dto = self.heartbeat_resource.send_heartbeat()
 
-        self.assertEqual(
-            actual_heartbeat_dto.get_city(), self.A_CITY
-        )
+        self.assertEqual(actual_heartbeat_dto.get_city(), self.A_CITY)
