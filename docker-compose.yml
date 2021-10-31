@@ -10,15 +10,36 @@ services:
       - "80:5000"
     volumes:
       - ./JoGod/src:/app/src
+    depends_on:
+      - fabob
+      - mongo
+      - neo4j
+
+  fabob:
+    container_name:
+      fabob
+    restart: always
+    build: ./Fabob/
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./Fabob/src:/app/src
+    depends_on:
+      - mongo
+      - neo4j
 
   mongo:
     image: mongo:4.2.0
     container_name:
       mongo_epicurien_tbd
+    hostname: mongodb_epicurien
     environment:
-      - MONGO_INITDB_DATABASE=epicurien-tbd
+      MONGO_INITDB_DATABASE: epicurien
+      MONGODB_DATA_DIR: /data/db
     volumes:
       - ./mongo-volume:/data/db
+    ports:
+      - "27017:27017"
 
   neo4j:
     image: neo4j:4.2.0
