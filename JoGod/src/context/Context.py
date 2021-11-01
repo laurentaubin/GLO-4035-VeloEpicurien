@@ -21,7 +21,9 @@ class Context:
         restaurant_resource = self.__create_restaurant_resource()
         segment_resource = self.__create_segment_resource()
 
-        return ApplicationServer(heartbeat_resource, restaurant_resource, segment_resource)
+        return ApplicationServer(
+            heartbeat_resource, restaurant_resource, segment_resource
+        )
 
     def __create_restaurant_resource(self) -> RestaurantResource:
         restaurant_repository = MongoRestaurantRepository(Config.MONGO_ADDRESS)

@@ -10,7 +10,7 @@ class ApplicationServer:
         self,
         heartbeat_resource: HeartbeatResource,
         restaurant_resource: RestaurantResource,
-            segment_resource: SegmentResource
+        segment_resource: SegmentResource,
     ):
         self.__heartbeat_resource = heartbeat_resource
         self.__restaurant_resource = restaurant_resource
@@ -36,11 +36,11 @@ class ApplicationServer:
     def __get_extracted_data(self) -> dict:
         return {
             "nbRestaurants": self.__restaurant_resource.get_total_number_of_restaurants(),
-            "nbSegments": self.__segment_resource.get_total_number_of_segments()
+            "nbSegments": self.__segment_resource.get_total_number_of_segments(),
         }
 
     def __get_transformed_data(self) -> dict:
         return {
             "restaurants": self.__restaurant_resource.get_number_of_restaurants_per_type(),
-            "longueurCyclable": self.__segment_resource.get_total_segment_length()
+            "longueurCyclable": self.__segment_resource.get_total_segment_length(),
         }
