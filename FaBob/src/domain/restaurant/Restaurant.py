@@ -9,4 +9,9 @@ class Restaurant:
         self.types = types
 
     def to_dict(self):
-        return {"id": self.id, "name": self.name, "coordinates": self.coordinates.to_dict(), "types": self.types}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "coordinates": self.coordinates.to_dict(),
+            "types": self.types,
+        }

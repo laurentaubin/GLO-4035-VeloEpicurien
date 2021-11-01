@@ -16,4 +16,3 @@ class ApplicationServer:
 
     def __load_data(self) -> None:
         pass
-        # return self.__loader_resource.load_restaurants()
