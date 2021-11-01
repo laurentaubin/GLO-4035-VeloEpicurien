@@ -14,6 +14,7 @@ class ApplicationServer:
         self.__app.add_url_rule("/heartbeat", "heartbeat", self.__send_heartbeat)
 
         self.__app.add_url_rule("/extracted_data", "extracted_data", self.__get_extracted_data)
+        self.__app.add_url_rule("/transformed_data", "transformed_data", self.__get_transformed_data)
 
     def run(self, hostname) -> None:
         self.__app.run(hostname)
@@ -23,3 +24,6 @@ class ApplicationServer:
 
     def __get_extracted_data(self) -> dict:
         return {"nbRestaurants": self.__restaurant_resource.get_total_number_of_restaurants()}
+
+    def __get_transformed_data(self) -> dict:
+        return {"restaurants": self.__restaurant_resource.get_number_of_restaurants_per_type()}
