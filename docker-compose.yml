@@ -19,11 +19,11 @@ services:
     container_name:
       fabob
     restart: always
-    build: ./Fabob/
+    build: ./FaBob/
     ports:
       - "5001:5001"
     volumes:
-      - ./Fabob/src:/app/src
+      - ./FaBob/src:/app/src
     depends_on:
       - mongo
       - neo4j
