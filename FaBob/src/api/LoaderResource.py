@@ -13,4 +13,6 @@ class LoaderResource:
 
     def load_restaurants(self) -> None:
         self.__restaurant_repository.load_restaurants()
+
+    def load_segments(self) -> None:
         self.__segment_repository.load_segments()

@@ -12,19 +12,18 @@ class MongoSegmentRepository(SegmentRepository):
         self.__segments_database = self.__mongo_client.epicurien
         self.__segments_collection = self.__segments_database["segments"]
         self.__segments_collection.remove({})
-        self.load_segments()
 
     def load_segments(self) -> None:
         segments = self.__read_segment_data_file()
         self.__segments_collection.insert_many(segments)
 
     def __read_segment_data_file(self) -> List[dict]:
-        segment_data_file = open(self.__segment_data_filepath)
-        segment_raw_data = json.load(segment_data_file).get("features")
-        segments = []
-        for raw_segment in segment_raw_data:
-            segments.append(self.__assemble_segment(raw_segment))
-        return segments
+        with open(self.__segment_data_filepath) as segment_data_file:
+            segment_raw_data = json.load(segment_data_file).get("features")
+            segments = []
+            for raw_segment in segment_raw_data:
+                segments.append(self.__assemble_segment(raw_segment))
+            return segments
 
     def __assemble_segment(self, segment_data_entry) -> dict:
         geometry = segment_data_entry["geometry"]
