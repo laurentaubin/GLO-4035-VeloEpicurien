@@ -8,9 +8,9 @@ class LoaderResource:
         restaurant_repository: RestaurantRepository,
         segment_repository: SegmentRepository,
     ) -> None:
-        self.restaurant_repository = restaurant_repository
-        self.segment_repository = segment_repository
+        self.__restaurant_repository = restaurant_repository
+        self.__segment_repository = segment_repository
 
     def load_restaurants(self) -> None:
-        self.restaurant_repository.load_restaurants()
-        self.segment_repository.load_segments()
+        self.__restaurant_repository.load_restaurants()
+        self.__segment_repository.load_segments()
