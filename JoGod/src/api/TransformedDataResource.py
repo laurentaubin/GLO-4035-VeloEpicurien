@@ -3,7 +3,11 @@ from domain.segment.SegmentRepository import SegmentRepository
 
 
 class TransformedDataResource:
-    def __init__(self, segment_repository: SegmentRepository, restaurant_repository: RestaurantRepository):
+    def __init__(
+        self,
+        segment_repository: SegmentRepository,
+        restaurant_repository: RestaurantRepository,
+    ):
         self.__segment_repository = segment_repository
         self.__restaurant_repository = restaurant_repository
 

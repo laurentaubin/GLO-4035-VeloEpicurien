@@ -7,10 +7,10 @@ from api.TransformedDataResource import TransformedDataResource
 
 class ApplicationServer:
     def __init__(
-            self,
-            heartbeat_resource: HeartbeatResource,
-            extracted_data_resource: ExtractedDataResource,
-            transformed_data_resource: TransformedDataResource
+        self,
+        heartbeat_resource: HeartbeatResource,
+        extracted_data_resource: ExtractedDataResource,
+        transformed_data_resource: TransformedDataResource,
     ):
         self.__heartbeat_resource = heartbeat_resource
         self.__extracted_data_resource = extracted_data_resource
