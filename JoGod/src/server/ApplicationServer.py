@@ -1,20 +1,20 @@
 from flask import Flask
 
+from api.ExtractedDataResource import ExtractedDataResource
 from api.HeartbeatResource import HeartbeatResource
-from api.RestaurantResource import RestaurantResource
-from api.SegmentResource import SegmentResource
+from api.TransformedDataResource import TransformedDataResource
 
 
 class ApplicationServer:
     def __init__(
-        self,
-        heartbeat_resource: HeartbeatResource,
-        restaurant_resource: RestaurantResource,
-        segment_resource: SegmentResource,
+            self,
+            heartbeat_resource: HeartbeatResource,
+            extracted_data_resource: ExtractedDataResource,
+            transformed_data_resource: TransformedDataResource
     ):
         self.__heartbeat_resource = heartbeat_resource
-        self.__restaurant_resource = restaurant_resource
-        self.__segment_resource = segment_resource
+        self.__extracted_data_resource = extracted_data_resource
+        self.__transformed_data_resource = transformed_data_resource
 
         self.__app = Flask(__name__)
         self.__app.config["JSON_AS_ASCII"] = False
@@ -34,13 +34,7 @@ class ApplicationServer:
         return self.__heartbeat_resource.send_heartbeat().to_dict()
 
     def __get_extracted_data(self) -> dict:
-        return {
-            "nbRestaurants": self.__restaurant_resource.get_total_number_of_restaurants(),
-            "nbSegments": self.__segment_resource.get_total_number_of_segments(),
-        }
+        return self.__extracted_data_resource.get_extracted_data()
 
     def __get_transformed_data(self) -> dict:
-        return {
-            "restaurants": self.__restaurant_resource.get_number_of_restaurants_per_type(),
-            "longueurCyclable": self.__segment_resource.get_total_segment_length(),
-        }
+        return self.__transformed_data_resource.get_transformed_data()

@@ -1,10 +1,10 @@
-from api.RestaurantResource import RestaurantResource
-from api.SegmentResource import SegmentResource
-from config import Config
+from api.ExtractedDataResource import ExtractedDataResource
 from api.HeartbeatResource import HeartbeatResource
-from infrastructure.restaurant.MongoRestaurantRepository import (
-    MongoRestaurantRepository,
-)
+from api.TransformedDataResource import TransformedDataResource
+from config import Config
+from domain.restaurant.RestaurantRepository import RestaurantRepository
+from domain.segment.SegmentRepository import SegmentRepository
+from infrastructure.restaurant.MongoRestaurantRepository import MongoRestaurantRepository
 from infrastructure.segment.MongoSegmentRepository import MongoSegmentRepository
 from server.ApplicationServer import ApplicationServer
 
@@ -17,18 +17,21 @@ class Context:
         self.__application_server.run(Config.BASE_HOSTNAME)
 
     def __create_application_server(self) -> ApplicationServer:
+        segment_repository = MongoSegmentRepository(Config.MONGO_ADDRESS)
+        restaurant_repository = MongoRestaurantRepository(Config.MONGO_ADDRESS)
+
         heartbeat_resource = HeartbeatResource(Config.CHOSEN_CITY)
-        restaurant_resource = self.__create_restaurant_resource()
-        segment_resource = self.__create_segment_resource()
+        transformed_data_resource = self.__create_transformed_data_resource(segment_repository, restaurant_repository)
+        extracted_data_ressource = self.__create_extracted_data_resource(segment_repository, restaurant_repository)
 
         return ApplicationServer(
-            heartbeat_resource, restaurant_resource, segment_resource
+            heartbeat_resource, extracted_data_ressource, transformed_data_resource
         )
 
-    def __create_restaurant_resource(self) -> RestaurantResource:
-        restaurant_repository = MongoRestaurantRepository(Config.MONGO_ADDRESS)
-        return RestaurantResource(restaurant_repository)
+    def __create_transformed_data_resource(self, segment_repository: SegmentRepository,
+                                           restaurant_repository: RestaurantRepository) -> TransformedDataResource:
+        return TransformedDataResource(segment_repository, restaurant_repository)
 
-    def __create_segment_resource(self) -> SegmentResource:
-        segment_repository = MongoSegmentRepository(Config.MONGO_ADDRESS)
-        return SegmentResource(segment_repository)
+    def __create_extracted_data_resource(self, segment_repository: SegmentRepository,
+                                         restaurant_repository: RestaurantRepository) -> ExtractedDataResource:
+        return ExtractedDataResource(segment_repository, restaurant_repository)
