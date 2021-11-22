@@ -1,6 +1,6 @@
 from typing import List
 
-from domain.Coordinates import Coordinates
+from domain.Coordinate import Coordinate
 from domain.restaurant.Restaurant import Restaurant
 from pymongo import MongoClient
 
@@ -23,7 +23,7 @@ class MongoRestaurantRepository(RestaurantRepository):
     def __assemble_restaurant(self, restaurant_document) -> Restaurant:
         identifier: str = restaurant_document["id"]
         name: str = restaurant_document["name"]
-        coordinates: Coordinates = Coordinates(
+        coordinates: Coordinate = Coordinate(
             restaurant_document["coordinates"]["latitude"],
             restaurant_document["coordinates"]["longitude"],
         )

@@ -26,7 +26,8 @@ class MongoSegmentRepository(SegmentRepository):
             return segments
 
     def __assemble_segment(self, segment_data_entry) -> dict:
+        id = segment_data_entry["properties"]["ID"]
         geometry = segment_data_entry["geometry"]
         length: str = segment_data_entry["properties"]["LONGUEUR"]
         name: str = segment_data_entry["properties"]["NOM_TOPOGRAPHIE"]
-        return {"geometry": geometry, "length": length, "name": name}
+        return {"id": id, "geometry": geometry, "length": length, "name": name}

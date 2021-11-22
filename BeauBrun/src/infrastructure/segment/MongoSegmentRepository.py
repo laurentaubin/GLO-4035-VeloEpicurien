@@ -1,6 +1,7 @@
 import json
 from typing import List
 
+from domain.Coordinate import Coordinate
 from domain.segment.Segment import Segment
 from domain.segment.SegmentCoordinates import SegmentCoordinates
 from domain.segment.SegmentGeometry import SegmentGeometry
@@ -14,14 +15,24 @@ class MongoSegmentRepository(SegmentRepository):
         self.__segments_database = self.__mongo_client.epicurien
         self.__segments_collection = self.__segments_database["segments"]
 
-    def find_all(self) -> List[dict]:
-        pass
+    def find_all(self) -> List[Segment]:
+        segment_documents = self.__segments_collection.find()
+        segments = []
+        for segment_document in segment_documents:
+            segments.append(self.__assemble_segment(segment_document))
+        return segments
 
-    def __assemble_segment(self, segment_data_entry) -> Segment:
-        segment_coordinates = SegmentCoordinates(segment_data_entry["geometry"]["coordinates"])
-        geometry_type: str = segment_data_entry["geometry"]["type"]
-        geometry = SegmentGeometry(geometry_type, segment_coordinates)
-        length: float = segment_data_entry["properties"]["LONGUEUR"]
-        name: str = segment_data_entry["properties"]["NOM_TOPOGRAPHIE"]
+    def __assemble_segment(self, segment_document) -> Segment:
+        geometry = segment_document["geometry"]
+        segment_geometry = SegmentGeometry(geometry["type"], SegmentCoordinates(
+            self.__assemble_coordinates(segment_document["geometry"]["coordinates"])))
+        length: float = segment_document["length"]
+        name: str = segment_document["name"]
         id: str = "anId"
-        return Segment(id, length, geometry, name)
+        return Segment(id, length, segment_geometry, name)
+
+    def __assemble_coordinates(self, raw_coordinates: List[List[float]]) -> List[Coordinate]:
+        coordinates = []
+        for raw_coordinate in raw_coordinates:
+            coordinates.append(Coordinate(raw_coordinate[1], raw_coordinate[0]))
+        return coordinates
