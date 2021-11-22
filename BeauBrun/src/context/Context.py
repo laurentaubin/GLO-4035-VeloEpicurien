@@ -14,7 +14,7 @@ class Context:
         self.__application_server = self.__create_application_server()
 
     def run(self):
-        graph_repository = NeoGraphRepository(Config.NEO4J_CONNECTION_STRING)
+        graph_repository = NeoGraphRepository(Config.NEO4J_CONNECTION_HOST, Config.NEO4J_PORT)
         restaurant_repository = MongoRestaurantRepository(
             Config.MONGO_ADDRESS
         )
