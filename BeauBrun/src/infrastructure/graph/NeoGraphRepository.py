@@ -52,4 +52,4 @@ class NeoGraphRepository:
         a = 0.5 - cos((second_vertex_coordinate.get_latitude() - first_vertex_coordinate.get_latitude()) * p) / 2 + cos(
             first_vertex_coordinate.get_latitude() * p) * cos(second_vertex_coordinate.get_latitude() * p) * (1 - cos(
             (second_vertex_coordinate.get_longitude() - first_vertex_coordinate.get_longitude()) * p)) / 2
-        return 12742 * asin(sqrt(a))
+        return 12742000 * asin(sqrt(a))
