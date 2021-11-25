@@ -20,6 +20,8 @@ class GraphService:
         for segment in segments:
             vertexes = self.__create_segment_vertexes(segment)
             self.__graph_repository.save_vertexes(vertexes)
+        print("\nNumber of vertexes: " + str(self.__graph_repository.get_number_of_vertexes()) + "\n")
+        self.__graph_repository.connect_near_vertexes()
 
     def connect_near_segments_together(self) -> None:
         pass

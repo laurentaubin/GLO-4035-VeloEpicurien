@@ -28,7 +28,7 @@ class MongoSegmentRepository(SegmentRepository):
             self.__assemble_coordinates(segment_document["geometry"]["coordinates"])))
         length: float = segment_document["length"]
         name: str = segment_document["name"]
-        id: str = "anId"
+        id: str = segment_document["segment_id"]
         return Segment(id, length, segment_geometry, name)
 
     def __assemble_coordinates(self, raw_coordinates: List[List[float]]) -> List[Coordinate]:

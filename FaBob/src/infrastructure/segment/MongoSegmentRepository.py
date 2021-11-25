@@ -30,4 +30,4 @@ class MongoSegmentRepository(SegmentRepository):
         geometry = segment_data_entry["geometry"]
         length: str = segment_data_entry["properties"]["LONGUEUR"]
         name: str = segment_data_entry["properties"]["NOM_TOPOGRAPHIE"]
-        return {"id": id, "geometry": geometry, "length": length, "name": name}
+        return {"segment_id": id, "geometry": geometry, "length": length, "name": name}
