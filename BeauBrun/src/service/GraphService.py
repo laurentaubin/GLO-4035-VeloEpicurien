@@ -1,3 +1,4 @@
+import time
 from math import pi, cos, asin, sqrt
 from typing import List
 
@@ -16,15 +17,21 @@ class GraphService:
         self.__restaurant_repository = restaurant_repository
 
     def load_segments(self) -> None:
+        print("\nSTARTING TO LOAD SEGMENTS IN GRAPH\n")
+        start = time.time()
         segments: List[Segment] = self.__segment_repository.find_all()
         for segment in segments:
             vertexes = self.__create_segment_vertexes(segment)
             self.__graph_repository.save_vertexes(vertexes)
-        print("\nNumber of vertexes: " + str(self.__graph_repository.get_number_of_vertexes()) + "\n")
-        self.__graph_repository.connect_near_vertexes()
+        print(f'\nTIME TO LOAD SEGMENTS IN GRAPH: {time.time() - start}\n')
 
     def connect_near_segments_together(self) -> None:
-        pass
+        print("\n CONNECTING NEAR VERTEXES\n")
+        start = time.time()
+        segments: List[Segment] = self.__segment_repository.find_all()
+        for segment in segments:
+            self.__graph_repository.connect_vertexes(segment.get_segment_id(), segment.get_near_segments())
+        print(f'\nTIME TO CONNECT NEAR VERTEXES : {time.time() - start}\n')
 
     def connect_restaurants_to_segments(self) -> None:
         pass
@@ -32,5 +39,5 @@ class GraphService:
     def __create_segment_vertexes(self, segment: Segment):
         vertexes = []
         for coordinate in segment.get_geometry().get_coordinates():
-            vertexes.append(Vertex(segment.get_id(), coordinate))
+            vertexes.append(Vertex(segment.get_segment_id(), coordinate))
         return vertexes

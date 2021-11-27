@@ -1,3 +1,9 @@
+import http.client
+import json
+import time
+
+import requests
+
 from api.LoaderResource import LoaderResource
 from config import Config
 from infrastructure.restaurant.MongoRestaurantRepository import (
@@ -23,7 +29,17 @@ class Context:
         )
         loader_resource.load_segments()
         loader_resource.load_restaurants()
+        self.__send_load_segment_beaubrun()
         self.__application_server.run("0.0.0.0")
 
     def __create_application_server(self) -> ApplicationServer:
         return ApplicationServer()
+
+    def __send_load_segment_beaubrun(self):
+        while True:
+            try:
+                requests.post("http://beaubrun:5000/load_segments")
+                return
+            except Exception as err:
+                print("\nERROR WHILE SENDING REQUEST TO BEAUBRUN: {0}\n".format(err))
+                time.sleep(2)

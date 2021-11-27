@@ -8,6 +8,6 @@ RUN pip install -r requirements.txt
 
 COPY src/ src
 
-EXPOSE 5001
+EXPOSE 5002
 
 CMD ["python", "-u", "src/__main__.py"]
