@@ -62,23 +62,23 @@ class NeoGraphRepository:
         for source_vertex_node_cursor in source_vertexes_nodes:
             source_vertex_node = source_vertex_node_cursor[0]
             source_vertex = self.__assemble_vertex(source_vertex_node)
-            for near_segment in near_segments:
-                print(near_segment)
+            for near_segment_id in near_segments:
+                if near_segment_id in self.__connected_segments:
+                    if source_segment_id in self.__connected_segments.get(near_segment_id):
+                        pass
                 near_segment_vertexes_cursor = self.__graph_client.run(
-                    "MATCH (vertex: Vertex {segment_id: '" + str(near_segment) + "'}) RETURN vertex")
+                    "MATCH (vertex: Vertex {segment_id: '" + str(near_segment_id) + "'}) RETURN vertex")
                 near_vertexes_nodes = near_segment_vertexes_cursor.to_table()
                 for near_vertex_node_cursor in near_vertexes_nodes:
                     near_vertex_node = near_vertex_node_cursor[0]
                     near_vertex = self.__assemble_vertex(near_vertex_node)
-                    print("NEAR:")
-                    print(near_vertex)
                     distance = self.__calculate_distance_between_vertex(source_vertex, near_vertex)
-                    print("DISTANCE:")
-                    print(distance)
                     if distance <= self.__MIN_DISTANCE_OUTSIDE_OFFICIAL_PATH:
                         print(distance)
                         relationships.append(
                             Relationship(source_vertex_node, "link_to", near_vertex_node, distance=distance))
+                        relationships.append(
+                            Relationship(near_vertex_node, "link_to", source_vertex_node, distance=distance))
         for relationship in relationships:
             self.__graph_client.create(relationship)
 

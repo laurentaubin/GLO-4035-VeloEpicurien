@@ -30,6 +30,7 @@ class GraphService:
         start = time.time()
         segments: List[Segment] = self.__segment_repository.find_all()
         for segment in segments:
+            print(segment.get_near_segments())
             self.__graph_repository.connect_vertexes(segment.get_segment_id(), segment.get_near_segments())
         print(f'\nTIME TO CONNECT NEAR VERTEXES : {time.time() - start}\n')
 
