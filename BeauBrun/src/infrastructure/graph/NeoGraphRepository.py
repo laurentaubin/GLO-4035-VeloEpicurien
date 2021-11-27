@@ -2,7 +2,7 @@ import logging
 import time
 from math import pi, cos, asin, sqrt
 from time import sleep
-from typing import List
+from typing import List, Dict
 
 from py2neo import Graph, Node, Relationship
 
@@ -16,6 +16,7 @@ class NeoGraphRepository:
     __GET_ALL_VERTEXES = "MATCH (vertex:Vertex) RETURN vertex"
 
     def __init__(self, host: str, port: str):
+        self.__connected_segments: Dict[str, List[str]] = {}
         self.__number_of_nodes = 0
         start = time.time()
         self.__graph_client = self.__get_graph_connection(host, port)
@@ -55,29 +56,47 @@ class NeoGraphRepository:
         return len(list(self.__graph_client.run(self.__GET_ALL_VERTEXES)))
 
     def connect_vertexes(self, source_segment_id: str, near_segments: List[str]):
+        number_of_fetch_saved = 0
         relationships = []
-        source_vertexes_cursor = self.__graph_client.run(
-            "MATCH (vertex: Vertex {segment_id: '" + str(source_segment_id) + "'}) RETURN vertex")
-        source_vertexes_nodes = source_vertexes_cursor.to_table()
-        for source_vertex_node_cursor in source_vertexes_nodes:
-            source_vertex_node = source_vertex_node_cursor[0]
+
+        # Collect source segment vertexes
+        source_vertexes_nodes: List[Node] = []
+        source_vertexes_result = self.__fetch_segment_vertexes_by_id(source_segment_id)
+        source_vertexes_entries = source_vertexes_result.to_table()
+        for source_vertex_node_entry in source_vertexes_entries:
+            source_vertexes_nodes.append(source_vertex_node_entry[0])
+
+        # Collect only near vertexes of segments not already connected
+        near_vertexes_nodes: List[Node] = []
+        for near_segment_id in near_segments:
+            if near_segment_id in self.__connected_segments:
+                if source_segment_id in self.__connected_segments.get(near_segment_id):
+                    number_of_fetch_saved += 1
+                    pass
+            near_segment_vertexes_result = self.__fetch_segment_vertexes_by_id(near_segment_id)
+            near_vertexes_entries = near_segment_vertexes_result.to_table()
+            for near_vertex_node_entry in near_vertexes_entries:
+                near_vertexes_nodes.append(near_vertex_node_entry[0])
+
+        # Connect source vertexes node to near vertexes nodes
+        for source_vertex_node in source_vertexes_nodes:
             source_vertex = self.__assemble_vertex(source_vertex_node)
-            for near_segment_id in near_segments:
-                near_segment_vertexes_cursor = self.__graph_client.run(
-                    "MATCH (vertex: Vertex {segment_id: '" + str(near_segment_id) + "'}) RETURN vertex")
-                near_vertexes_nodes = near_segment_vertexes_cursor.to_table()
-                for near_vertex_node_cursor in near_vertexes_nodes:
-                    near_vertex_node = near_vertex_node_cursor[0]
-                    near_vertex = self.__assemble_vertex(near_vertex_node)
-                    distance = self.__calculate_distance_between_vertex(source_vertex, near_vertex)
-                    if distance <= self.__MIN_DISTANCE_OUTSIDE_OFFICIAL_PATH:
-                        print(distance)
-                        relationships.append(
-                            Relationship(source_vertex_node, "link_to", near_vertex_node, distance=distance))
-                        relationships.append(
-                            Relationship(near_vertex_node, "link_to", source_vertex_node, distance=distance))
+            for near_vertex_node in near_vertexes_nodes:
+                near_vertex = self.__assemble_vertex(near_vertex_node)
+                distance = self.__calculate_distance_between_vertex(source_vertex, near_vertex)
+                if distance <= self.__MIN_DISTANCE_OUTSIDE_OFFICIAL_PATH:
+                    # Bidirectional relationship, enable caching of already connected segments
+                    relationships.append(
+                        Relationship(source_vertex_node, "link_to", near_vertex_node, distance=distance))
+                    relationships.append(
+                        Relationship(near_vertex_node, "link_to", source_vertex_node, distance=distance))
+
+        self.__connected_segments[source_segment_id] = near_segments
+
         for relationship in relationships:
             self.__graph_client.create(relationship)
+        print("NUMBER OF FETCH SAVED: {0}".format(str(number_of_fetch_saved)))
+        return number_of_fetch_saved
 
     def __calculate_distance_between_vertex(self, first_vertex: Vertex, second_vertex: Vertex):
         first_vertex_coordinate = first_vertex.get_coordinate()
@@ -91,3 +110,7 @@ class NeoGraphRepository:
     def __assemble_vertex(self, vertex_node: Node):
         return Vertex(vertex_node["segment_id"],
                       Coordinate(float(vertex_node["latitude"]), float(vertex_node["longitude"])))
+
+    def __fetch_segment_vertexes_by_id(self, segment_id: str):
+        return self.__graph_client.run(
+            "MATCH (vertex: Vertex {segment_id: '" + str(segment_id) + "'}) RETURN vertex")

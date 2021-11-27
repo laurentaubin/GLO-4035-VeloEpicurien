@@ -13,11 +13,14 @@ class MongoSegmentRepository(SegmentRepository):
         self.__segment_data_filepath = segment_data_filepath
         self.__segments_database = self.__mongo_client.epicurien
         self.__segments_collection = self.__segments_database["segments"]
+        self.__vertexes_collection = self.__segments_database["vertexes"]
         self.__segments_collection.remove({})
         self.__segments_collection.create_index([('geometry', "2dsphere")],
                                                 name='geometry')
+        self.__vertexes_collection.create_index([('geometry', "2dsphere")], name='geometry')
 
     def load_segments(self) -> None:
+        number_of_duplicate = 0
         segments = self.__read_segment_data_file()
         self.__segments_collection.insert_many(segments)
         for segment in segments:
@@ -30,7 +33,10 @@ class MongoSegmentRepository(SegmentRepository):
                     },
                     '$maxDistance': 50}}})
                 for near_segment in near_segments_doc:
-                    near_segments.add(near_segment["segment_id"])
+                    if near_segment["segment_id"] != segment["segment_id"]:
+                        near_segments.add(near_segment["segment_id"])
+                    else:
+                        number_of_duplicate += 1
             near_segments = list(near_segments)
             segment["near_segments"] = near_segments
             self.__segments_collection.update_one({"segment_id": segment["segment_id"]},
