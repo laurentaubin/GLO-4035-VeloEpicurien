@@ -45,6 +45,7 @@ class GraphService:
         total_number_of_restaurants = len(restaurants)
         for restaurant in restaurants:
             self.__graph_repository.save_restaurant(restaurant)
+            number_of_restaurants_connected += 1
             print("\n RESTAURANT {name} CONNECTED - {nbr_connected}/{total}".format(name=restaurant.get_name(),
                                                                                     nbr_connected=str(
                                                                                         number_of_restaurants_connected),
