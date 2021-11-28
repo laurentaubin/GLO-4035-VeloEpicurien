@@ -3,6 +3,7 @@ from typing import List
 
 import pymongo
 
+from domain.Coordinates import Coordinates
 from domain.segment.SegmentRepository import SegmentRepository
 from pymongo import MongoClient
 
@@ -13,11 +14,9 @@ class MongoSegmentRepository(SegmentRepository):
         self.__segment_data_filepath = segment_data_filepath
         self.__segments_database = self.__mongo_client.epicurien
         self.__segments_collection = self.__segments_database["segments"]
-        self.__vertexes_collection = self.__segments_database["vertexes"]
         self.__segments_collection.remove({})
         self.__segments_collection.create_index([('geometry', "2dsphere")],
                                                 name='geometry')
-        self.__vertexes_collection.create_index([('geometry', "2dsphere")], name='geometry')
 
     def load_segments(self) -> None:
         number_of_duplicate = 0
@@ -31,7 +30,7 @@ class MongoSegmentRepository(SegmentRepository):
                         "type": "Point",
                         "coordinates": coordinates
                     },
-                    '$maxDistance': 50}}})
+                    '$maxDistance': 25}}})
                 for near_segment in near_segments_doc:
                     if near_segment["segment_id"] != segment["segment_id"]:
                         near_segments.add(near_segment["segment_id"])
@@ -42,6 +41,19 @@ class MongoSegmentRepository(SegmentRepository):
             self.__segments_collection.update_one({"segment_id": segment["segment_id"]},
                                                   {"$set": {"near_segments": near_segments}}, upsert=False)
         print("\n DONE LOADING SEGMENTS MONGO \n")
+
+    def find_near_segments(self, coordinates: Coordinates) -> List[str]:
+        near_segments = set()
+        near_segments_doc = self.__segments_collection.find({"geometry": {'$nearSphere': {
+            '$geometry': {
+                "type": "Point",
+                "coordinates": [coordinates.get_longitude(), coordinates.get_latitude()]
+            },
+            '$maxDistance': 500}}})
+        for near_segment in near_segments_doc:
+            near_segments.add(near_segment["segment_id"])
+        near_segments = list(near_segments)
+        return near_segments
 
     def __read_segment_data_file(self) -> List[dict]:
         with open(self.__segment_data_filepath) as segment_data_file:
