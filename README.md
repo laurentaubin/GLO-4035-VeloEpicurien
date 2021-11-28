@@ -1,10 +1,12 @@
-# Velo epicurien - Name TBD
+# Velo epicurien
 
 ## App structure
 ### Services
 | Name  | Description        |
 |-------|-------------|
 | [JoGod](JoGod) | Python Api Gateway |
+| [FaBob](FaBob) | Python data transformer and sink to MongoDB |
+| [Thierry](Thierry) | Python scripts to extract raw data from external APIs |
 
 ## Getting started
 Follow these instructions to get a copy of the project up and running on your local machine
