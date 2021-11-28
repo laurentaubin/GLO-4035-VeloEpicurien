@@ -105,25 +105,21 @@ class NeoGraphRepository:
                                restaurant_id=restaurant.get_id(), types=restaurant.get_types())
         self.__graph_client.create(restaurant_node)
 
-        vertex_nodes: List[Node] = []
+        # For each segment, connect the restaurant to the nearest vertex
         for segment_id in restaurant.get_near_segments():
+            vertex_closest_to_restaurant = None
+            min_distance_with_restaurant = float("inf")
             near_segment_vertexes_result = self.__fetch_segment_vertexes_by_id(segment_id)
             near_vertexes_entries = near_segment_vertexes_result.to_table()
             for near_vertex_node_entry in near_vertexes_entries:
-                vertex_nodes.append(near_vertex_node_entry[0])
-
-        vertex_closest_to_restaurant = None
-        min_distance_with_restaurant = float("inf")
-        for vertex_node in vertex_nodes:
-            vertex = self.__assemble_vertex(vertex_node)
-            distance = self.__calculate_distance(vertex.get_coordinate(), restaurant.get_coordinates())
-            if distance < min_distance_with_restaurant:
-                min_distance_with_restaurant = distance
-                vertex_closest_to_restaurant = vertex_node
-        if vertex_closest_to_restaurant is None:
-            return "NOT CONNECTED"
-        self.__graph_client.create(Relationship(restaurant_node, "on_path", vertex_closest_to_restaurant))
-        return min_distance_with_restaurant
+                vertex_node = near_vertex_node_entry[0]
+                vertex = self.__assemble_vertex(vertex_node)
+                distance = self.__calculate_distance(vertex.get_coordinate(), restaurant.get_coordinates())
+                if distance < min_distance_with_restaurant:
+                    min_distance_with_restaurant = distance
+                    vertex_closest_to_restaurant = vertex_node
+                self.__graph_client.create(Relationship(restaurant_node, "on_path", vertex_closest_to_restaurant,
+                                                        distance=min_distance_with_restaurant))
 
     def __calculate_distance(self, first_coordinates: Coordinate, second_coordinates: Coordinate):
         p = pi / 180

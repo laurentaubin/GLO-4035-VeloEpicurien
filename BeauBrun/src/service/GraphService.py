@@ -41,9 +41,15 @@ class GraphService:
         print("\n CONNECTING RESTAURANTS TO VERTEXES")
         start = time.time()
         restaurants = self.__restaurant_repository.find_all()
+        number_of_restaurants_connected = 0
+        total_number_of_restaurants = len(restaurants)
         for restaurant in restaurants:
-            distance_with_closest_vertex = self.__graph_repository.save_restaurant(restaurant)
-            print("\n DISTANCE WITH CLOSEST VERTEX: ", distance_with_closest_vertex)
+            self.__graph_repository.save_restaurant(restaurant)
+            print("\n RESTAURANT {name} CONNECTED - {nbr_connected}/{total}".format(name=restaurant.get_name(),
+                                                                                    nbr_connected=str(
+                                                                                        number_of_restaurants_connected),
+                                                                                    total=str(
+                                                                                        total_number_of_restaurants)))
         print(f'\nTIME TO CONNECT RESTAURANTS: {time.time() - start}\n')
 
     def __create_segment_vertexes(self, segment: Segment):
