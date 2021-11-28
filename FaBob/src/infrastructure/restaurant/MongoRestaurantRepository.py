@@ -51,7 +51,7 @@ class MongoRestaurantRepository(RestaurantRepository):
             restaurant_data_entry["coordinates"]["latitude"],
             restaurant_data_entry["coordinates"]["longitude"],
         )
-        types = restaurant_data_entry["categories"]
+        types = [category["title"] for category in restaurant_data_entry["categories"]]
         return Restaurant(identifier, name, coordinates, types)
 
     def __assemble_restaurant_from_document(self, restaurant_document) -> Restaurant:

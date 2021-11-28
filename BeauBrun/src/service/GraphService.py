@@ -31,9 +31,6 @@ class GraphService:
         start = time.time()
         segments: List[Segment] = self.__segment_repository.find_all()
         for segment in segments:
-            print("\n")
-            print("SEGMENT ID: ", segment.get_segment_id())
-            print("NEAR SEGMENTS: ", segment.get_near_segments())
             number_of_fetch_saved += self.__graph_repository.connect_vertexes(segment.get_segment_id(),
                                                                               segment.get_near_segments())
             print("\nTOTAL NUMBER OF FETCH SAVED: {0}".format(str(number_of_fetch_saved)))
@@ -41,7 +38,13 @@ class GraphService:
         print(f'\nTIME TO CONNECT NEAR VERTEXES : {time.time() - start}\n')
 
     def connect_restaurants_to_segments(self) -> None:
-        pass
+        print("\n CONNECTING RESTAURANTS TO VERTEXES")
+        start = time.time()
+        restaurants = self.__restaurant_repository.find_all()
+        for restaurant in restaurants:
+            distance_with_closest_vertex = self.__graph_repository.save_restaurant(restaurant)
+            print("\n DISTANCE WITH CLOSEST VERTEX: ", distance_with_closest_vertex)
+        print(f'\nTIME TO CONNECT RESTAURANTS: {time.time() - start}\n')
 
     def __create_segment_vertexes(self, segment: Segment):
         vertexes = []

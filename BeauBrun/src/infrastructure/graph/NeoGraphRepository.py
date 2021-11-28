@@ -7,11 +7,12 @@ from typing import List, Dict
 from py2neo import Graph, Node, Relationship
 
 from domain.Coordinate import Coordinate
+from domain.restaurant.Restaurant import Restaurant
 from domain.segment.Vertex import Vertex
 
 
 class NeoGraphRepository:
-    __MIN_DISTANCE_OUTSIDE_OFFICIAL_PATH = 50
+    __MIN_DISTANCE_OUTSIDE_OFFICIAL_PATH = 25
     __WIPE_COMMAND = "MATCH (n) DETACH DELETE n"
     __GET_ALL_VERTEXES = "MATCH (vertex:Vertex) RETURN vertex"
 
@@ -97,6 +98,39 @@ class NeoGraphRepository:
             self.__graph_client.create(relationship)
         print("NUMBER OF FETCH SAVED: {0}".format(str(number_of_fetch_saved)))
         return number_of_fetch_saved
+
+    def save_restaurant(self, restaurant: Restaurant):
+        restaurant_node = Node("Restaurant", latitude=str(restaurant.get_coordinates().get_latitude()),
+                               longitude=str(restaurant.get_coordinates().get_longitude()),
+                               restaurant_id=restaurant.get_id(), types=restaurant.get_types())
+        self.__graph_client.create(restaurant_node)
+
+        vertex_nodes: List[Node] = []
+        for segment_id in restaurant.get_near_segments():
+            near_segment_vertexes_result = self.__fetch_segment_vertexes_by_id(segment_id)
+            near_vertexes_entries = near_segment_vertexes_result.to_table()
+            for near_vertex_node_entry in near_vertexes_entries:
+                vertex_nodes.append(near_vertex_node_entry[0])
+
+        vertex_closest_to_restaurant = None
+        min_distance_with_restaurant = float("inf")
+        for vertex_node in vertex_nodes:
+            vertex = self.__assemble_vertex(vertex_node)
+            distance = self.__calculate_distance(vertex.get_coordinate(), restaurant.get_coordinates())
+            if distance < min_distance_with_restaurant:
+                min_distance_with_restaurant = distance
+                vertex_closest_to_restaurant = vertex_node
+        if vertex_closest_to_restaurant is None:
+            return "NOT CONNECTED"
+        self.__graph_client.create(Relationship(restaurant_node, "on_path", vertex_closest_to_restaurant))
+        return min_distance_with_restaurant
+
+    def __calculate_distance(self, first_coordinates: Coordinate, second_coordinates: Coordinate):
+        p = pi / 180
+        a = 0.5 - cos((second_coordinates.get_latitude() - first_coordinates.get_latitude()) * p) / 2 + cos(
+            first_coordinates.get_latitude() * p) * cos(second_coordinates.get_latitude() * p) * (1 - cos(
+            (second_coordinates.get_longitude() - first_coordinates.get_longitude()) * p)) / 2
+        return 12742000 * asin(sqrt(a))
 
     def __calculate_distance_between_vertex(self, first_vertex: Vertex, second_vertex: Vertex):
         first_vertex_coordinate = first_vertex.get_coordinate()

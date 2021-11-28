@@ -27,5 +27,6 @@ class MongoRestaurantRepository(RestaurantRepository):
             restaurant_document["coordinates"]["latitude"],
             restaurant_document["coordinates"]["longitude"],
         )
-        types = restaurant_document["categories"]
-        return Restaurant(identifier, name, coordinates, types)
+        types = restaurant_document["types"]
+        near_segments = restaurant_document["near_segments"]
+        return Restaurant(identifier, name, coordinates, types, near_segments)
