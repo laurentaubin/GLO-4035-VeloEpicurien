@@ -14,6 +14,7 @@ services:
       - fabob
       - mongo
       - neo4j
+      - beaubrun
 
   fabob:
     container_name:
@@ -27,6 +28,20 @@ services:
     depends_on:
       - mongo
       - neo4j
+
+  beaubrun:
+    container_name:
+      beaubrun
+    restart: always
+    build: ./BeauBrun
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./BeauBrun/src:/app/src
+    depends_on:
+      - fabob
+      - neo4j
+      - mongo
 
   mongo:
     image: mongo:4.2.0
@@ -45,8 +60,12 @@ services:
     image: neo4j:4.2.0
     container_name:
       neo4j_epicurien
+    hostname: neo4j_epicurien
     volumes:
       - ./neo4j/plugins:/plugins
     environment:
-      NEO4J_AUTH: neo4j/streams
+      NEO4J_AUTH: none
       NEO4J_dbms_logs_debug_level: DEBUG
+    ports:
+      - "7474:7474"
+      - "7687:7687"
