@@ -6,6 +6,7 @@ COPY requirements.txt .
 
 RUN pip install -r requirements.txt
 
+COPY PROJECT_README.md .
 COPY src/ src
 
 EXPOSE 5000

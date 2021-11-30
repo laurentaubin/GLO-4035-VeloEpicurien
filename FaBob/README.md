@@ -1,4 +1,4 @@
-# FaBob - Name TBD
+# FaBob
 
 ### Run the app in a dev environment
 #### Install packages

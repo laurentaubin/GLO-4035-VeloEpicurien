@@ -46,7 +46,7 @@ services:
   mongo:
     image: mongo:4.2.0
     container_name:
-      mongo_epicurien_tbd
+      mongo_epicurien
     hostname: mongodb_epicurien
     environment:
       MONGO_INITDB_DATABASE: epicurien
@@ -59,7 +59,7 @@ services:
   neo4j:
     image: neo4j:4.2.0
     container_name:
-      neo4j_epicurien_tbd
+      neo4j_epicurien
     hostname: neo4j_epicurien
     volumes:
       - ./neo4j/plugins:/plugins

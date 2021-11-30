@@ -1,5 +1,6 @@
 from api.ExtractedDataResource import ExtractedDataResource
 from api.HeartbeatResource import HeartbeatResource
+from api.ReadMeResource import ReadMeResource
 from api.TransformedDataResource import TransformedDataResource
 from config import Config
 from domain.restaurant.RestaurantRepository import RestaurantRepository
@@ -23,15 +24,16 @@ class Context:
         restaurant_repository = MongoRestaurantRepository(Config.MONGO_ADDRESS)
 
         heartbeat_resource = HeartbeatResource(Config.CHOSEN_CITY)
+        readme_resource = ReadMeResource(Config.README_PATH)
         transformed_data_resource = self.__create_transformed_data_resource(
             segment_repository, restaurant_repository
         )
-        extracted_data_ressource = self.__create_extracted_data_resource(
+        extracted_data_resource = self.__create_extracted_data_resource(
             segment_repository, restaurant_repository
         )
 
         return ApplicationServer(
-            heartbeat_resource, extracted_data_ressource, transformed_data_resource
+            heartbeat_resource, readme_resource, extracted_data_resource, transformed_data_resource
         )
 
     def __create_transformed_data_resource(

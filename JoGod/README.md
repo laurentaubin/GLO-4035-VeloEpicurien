@@ -1,4 +1,4 @@
-# JoGod - Name TBD
+# JoGod
 
 ### Run the app in a dev environment
 #### Install packages
