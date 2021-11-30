@@ -17,6 +17,7 @@ class GraphService:
         self.__restaurant_repository = restaurant_repository
 
     def load_segments(self) -> None:
+        return
         print("\nSTARTING TO LOAD SEGMENTS IN GRAPH\n")
         start = time.time()
         segments: List[Segment] = self.__segment_repository.find_all()
@@ -26,6 +27,7 @@ class GraphService:
         print(f'\nTIME TO LOAD SEGMENTS IN GRAPH: {time.time() - start}\n')
 
     def connect_near_segments_together(self) -> None:
+        return
         number_of_fetch_saved = 0
         print("\n CONNECTING NEAR VERTEXES\n")
         start = time.time()
@@ -38,6 +40,7 @@ class GraphService:
         print(f'\nTIME TO CONNECT NEAR VERTEXES : {time.time() - start}\n')
 
     def connect_restaurants_to_segments(self) -> None:
+        return
         print("\n CONNECTING RESTAURANTS TO VERTEXES")
         start = time.time()
         restaurants = self.__restaurant_repository.find_all()
@@ -54,6 +57,7 @@ class GraphService:
         print(f'\nTIME TO CONNECT RESTAURANTS: {time.time() - start}\n')
 
     def __create_segment_vertexes(self, segment: Segment):
+        return
         vertexes = []
         for coordinate in segment.get_geometry().get_coordinates():
             vertexes.append(Vertex(segment.get_segment_id(), coordinate))
