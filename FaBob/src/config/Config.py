@@ -7,3 +7,6 @@ MONGO_ADDRESS = "mongodb://mongodb_epicurien:27017"
 # Data file path
 RESTAURANTS_FILE_PATH = "src/data/restaurant_data.json"
 SEGMENTS_FILE_PATH = "src/data/vdq-reseaucyclable.json"
+
+# Beaubrun
+BEAUBRUN_ADDRESS = "http://beaubrun:5002"
