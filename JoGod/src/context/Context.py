@@ -33,7 +33,10 @@ class Context:
         )
 
         return ApplicationServer(
-            heartbeat_resource, readme_resource, extracted_data_resource, transformed_data_resource
+            heartbeat_resource,
+            readme_resource,
+            extracted_data_resource,
+            transformed_data_resource,
         )
 
     def __create_transformed_data_resource(

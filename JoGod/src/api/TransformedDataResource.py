@@ -18,6 +18,4 @@ class TransformedDataResource:
         }
 
     def get_restaurant_types(self) -> dict:
-        return {
-            "type": self.__restaurant_repository.get_restaurant_types()
-        }
+        return {"type": self.__restaurant_repository.get_restaurant_types()}

@@ -36,4 +36,3 @@ class MongoRestaurantRepository(RestaurantRepository):
             restaurant_types.append(entry.get("_id"))
 
         return restaurant_types
-

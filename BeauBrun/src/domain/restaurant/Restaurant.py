@@ -4,7 +4,14 @@ from domain.Coordinate import Coordinate
 
 
 class Restaurant:
-    def __init__(self, identifier: str, name: str, coordinates: Coordinate, types: List[str], near_segments: List[str]):
+    def __init__(
+        self,
+        identifier: str,
+        name: str,
+        coordinates: Coordinate,
+        types: List[str],
+        near_segments: List[str],
+    ):
         self.__id = identifier
         self.__name = name
         self.__coordinates = coordinates

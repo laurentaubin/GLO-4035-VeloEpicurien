@@ -4,7 +4,7 @@ from domain.restaurant.Restaurant import Restaurant
 
 
 class RestaurantRepository:
-    def find_all(self) ->  List[Restaurant]:
+    def find_all(self) -> List[Restaurant]:
         pass
 
     def update(self, restaurant: Restaurant):
