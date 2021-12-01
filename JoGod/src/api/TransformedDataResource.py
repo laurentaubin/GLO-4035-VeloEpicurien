@@ -16,3 +16,6 @@ class TransformedDataResource:
             "restaurants": self.__restaurant_repository.get_number_of_restaurants_per_type(),
             "longueurCyclable": self.__segment_repository.get_total_segment_length(),
         }
+
+    def get_restaurant_types(self) -> dict:
+        return {"type": self.__restaurant_repository.get_restaurant_types()}

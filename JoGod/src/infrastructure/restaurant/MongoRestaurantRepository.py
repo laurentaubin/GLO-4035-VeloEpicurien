@@ -17,9 +17,22 @@ class MongoRestaurantRepository(RestaurantRepository):
         cursor = self.__restaurants_collection.aggregate(
             [
                 {"$unwind": "$types"},
-                {"$group": {"_id": "$types.title", "count": {"$sum": 1}}},
+                {"$group": {"_id": "$types", "count": {"$sum": 1}}},
             ]
         )
         for entry in cursor:
             number_of_restaurants_per_type[entry.get("_id")] = entry.get("count")
         return number_of_restaurants_per_type
+
+    def get_restaurant_types(self) -> list:
+        restaurant_types = []
+        cursor = self.__restaurants_collection.aggregate(
+            [
+                {"$unwind": "$types"},
+                {"$group": {"_id": "$types"}},
+            ]
+        )
+        for entry in cursor:
+            restaurant_types.append(entry.get("_id"))
+
+        return restaurant_types

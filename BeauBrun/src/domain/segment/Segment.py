@@ -4,7 +4,14 @@ from domain.segment.SegmentGeometry import SegmentGeometry
 
 
 class Segment:
-    def __init__(self, segment_id: str, length: float, geometry: SegmentGeometry, name: str, near_segments: List[str]):
+    def __init__(
+        self,
+        segment_id: str,
+        length: float,
+        geometry: SegmentGeometry,
+        name: str,
+        near_segments: List[str],
+    ):
         self.__segment_id = segment_id
         self.__length = length
         self.__geometry = geometry

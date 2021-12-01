@@ -9,6 +9,3 @@ class SegmentCoordinates:
 
     def get_coordinates(self):
         return self.__segment_coordinates
-
-
-

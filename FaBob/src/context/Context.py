@@ -27,13 +27,12 @@ class Context:
             Config.SEGMENTS_FILE_PATH,
         )
 
-        loader_resource = LoaderResource(
-            restaurant_repository,
-            segment_repository
-        )
+        loader_resource = LoaderResource(restaurant_repository, segment_repository)
         loader_resource.load_segments()
         loader_resource.load_restaurants()
-        ConnectorService(restaurant_repository, segment_repository).connect_near_restaurants_to_segments()
+        ConnectorService(
+            restaurant_repository, segment_repository
+        ).connect_near_restaurants_to_segments()
         self.__send_load_segment_beaubrun()
         self.__application_server.run("0.0.0.0")
 

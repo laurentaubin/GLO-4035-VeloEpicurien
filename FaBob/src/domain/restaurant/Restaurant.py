@@ -4,7 +4,9 @@ from domain.Coordinates import Coordinates
 
 
 class Restaurant:
-    def __init__(self, identifier: str, name: str, coordinates: Coordinates, types: List[str]):
+    def __init__(
+        self, identifier: str, name: str, coordinates: Coordinates, types: List[str]
+    ):
         self.__id = identifier
         self.__name = name
         self.__coordinates = coordinates
@@ -19,7 +21,7 @@ class Restaurant:
             "coordinates": self.__coordinates.to_dict(),
             "types": self.__types,
             "geometry": self.__geometry,
-            "near_segments": self.__near_segments
+            "near_segments": self.__near_segments,
         }
 
     def get_id(self) -> str:

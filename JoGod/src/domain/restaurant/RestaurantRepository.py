@@ -4,3 +4,6 @@ class RestaurantRepository:
 
     def get_number_of_restaurants_per_type(self) -> dict:
         pass
+
+    def get_restaurant_types(self) -> dict:
+        pass

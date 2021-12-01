@@ -25,13 +25,17 @@ class MongoRestaurantRepository(RestaurantRepository):
         restaurant_documents = self.__restaurants_collection.find()
         restaurants = []
         for restaurant_document in restaurant_documents:
-            restaurants.append(self.__assemble_restaurant_from_document(restaurant_document))
+            restaurants.append(
+                self.__assemble_restaurant_from_document(restaurant_document)
+            )
         return restaurants
 
     def update(self, restaurant: Restaurant):
-        self.__restaurants_collection.update_one({"id": restaurant.get_id()},
-                                                 {"$set": {"near_segments": restaurant.get_near_segments()}},
-                                                 upsert=False)
+        self.__restaurants_collection.update_one(
+            {"id": restaurant.get_id()},
+            {"$set": {"near_segments": restaurant.get_near_segments()}},
+            upsert=False,
+        )
 
     def __read_restaurant_data_file(self):
         with open(self.__restaurant_data_filepath) as restaurant_data_file:
@@ -39,8 +43,15 @@ class MongoRestaurantRepository(RestaurantRepository):
             restaurants: List[Restaurant] = []
             for raw_restaurant in restaurant_raw_data:
                 restaurant = self.__assemble_restaurant(raw_restaurant)
-                restaurant.set_geometry({"type": "Point", "coordinates": [restaurant.get_coordinates().get_longitude(),
-                                                                          restaurant.get_coordinates().get_latitude()]})
+                restaurant.set_geometry(
+                    {
+                        "type": "Point",
+                        "coordinates": [
+                            restaurant.get_coordinates().get_longitude(),
+                            restaurant.get_coordinates().get_latitude(),
+                        ],
+                    }
+                )
                 restaurants.append(restaurant)
             return restaurants
 

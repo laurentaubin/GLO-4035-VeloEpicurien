@@ -11,11 +11,11 @@ from api.TransformedDataResource import TransformedDataResource
 
 class ApplicationServer:
     def __init__(
-            self,
-            heartbeat_resource: HeartbeatResource,
-            readme_resource: ReadMeResource,
-            extracted_data_resource: ExtractedDataResource,
-            transformed_data_resource: TransformedDataResource,
+        self,
+        heartbeat_resource: HeartbeatResource,
+        readme_resource: ReadMeResource,
+        extracted_data_resource: ExtractedDataResource,
+        transformed_data_resource: TransformedDataResource,
     ):
         self.__heartbeat_resource = heartbeat_resource
         self.__readme_resource = readme_resource
@@ -34,6 +34,7 @@ class ApplicationServer:
         self.__app.add_url_rule(
             "/transformed_data", "transformed_data", self.__get_transformed_data
         )
+        self.__app.add_url_rule("/type", "type", self.__get_restaurant_types)
 
     def run(self, hostname) -> None:
         self.__app.run(hostname)
@@ -50,3 +51,6 @@ class ApplicationServer:
 
     def __get_transformed_data(self) -> dict:
         return self.__transformed_data_resource.get_transformed_data()
+
+    def __get_restaurant_types(self) -> dict:
+        return self.__transformed_data_resource.get_restaurant_types()
