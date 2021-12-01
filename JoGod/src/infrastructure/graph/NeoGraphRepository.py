@@ -22,3 +22,9 @@ class NeoGraphRepository(GraphRepository):
                 logging.warning("ERROR CONNECTING TO NEO: {0}, TRYING AGAIN".format(e))
                 pass
 
+    def get_starting_vertex_node(self, starting_point: dict):
+        latitude = starting_point["coordinates"][1]
+        longitude = starting_point["coordinates"][0]
+
+        return {}
+

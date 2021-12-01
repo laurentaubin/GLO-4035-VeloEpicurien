@@ -1,3 +1,3 @@
 class GraphRepository:
-    def a_function(self):
+    def get_starting_vertex_node(self, starting_point: dict):
         pass

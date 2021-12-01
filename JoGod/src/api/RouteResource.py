@@ -14,8 +14,9 @@ class RouteResource:
             return {"error": "bad request", "description": "missing body"}
 
         starting_point: dict = body["startingPoint"]
-        type: List[str] = body["type"]
+        restaurant_types: List[str] = body["type"]
         number_of_stops: int = body["numberOfStops"]
+        length: int = body["length"]
 
-        self.__route_service.generate_route()
+        return self.__route_service.generate_route(starting_point, restaurant_types, number_of_stops, length)
 

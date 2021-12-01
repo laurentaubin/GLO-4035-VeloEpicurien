@@ -39,7 +39,7 @@ class ApplicationServer:
             "/transformed_data", "transformed_data", self.__get_transformed_data
         )
         self.__app.add_url_rule("/type", "type", self.__get_restaurant_types)
-        self.__app.add_url_rule("/parcours", "parcours", self.__route_resource, methods=["POST"])
+        self.__app.add_url_rule("/parcours", "parcours", self.__get_parcours, methods=["POST"])
 
     def run(self, hostname) -> None:
         self.__app.run(hostname)
