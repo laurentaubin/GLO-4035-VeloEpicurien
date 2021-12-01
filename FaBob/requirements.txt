@@ -5,3 +5,4 @@ py==1.10.0
 pylint==2.6.0
 pymongo==3.12.1
 requests==v2.26.0
+py2neo==2021.2.3
