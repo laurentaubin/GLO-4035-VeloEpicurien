@@ -27,4 +27,3 @@ class NeoGraphRepository(GraphRepository):
         longitude = starting_point["coordinates"][0]
 
         return {}
-

@@ -25,7 +25,9 @@ class Context:
     def __create_application_server(self) -> ApplicationServer:
         segment_repository = MongoSegmentRepository(Config.MONGO_ADDRESS)
         restaurant_repository = MongoRestaurantRepository(Config.MONGO_ADDRESS)
-        graph_repository = NeoGraphRepository(Config.NEO4J_CONNECTION_HOST, Config.NEO4J_PORT)
+        graph_repository = NeoGraphRepository(
+            Config.NEO4J_CONNECTION_HOST, Config.NEO4J_PORT
+        )
 
         heartbeat_resource = HeartbeatResource(Config.CHOSEN_CITY)
         readme_resource = ReadMeResource(Config.README_PATH)
@@ -44,7 +46,7 @@ class Context:
             readme_resource,
             extracted_data_resource,
             transformed_data_resource,
-            route_resource
+            route_resource,
         )
 
     def __create_transformed_data_resource(

@@ -39,10 +39,14 @@ class Context:
         ).connect_near_restaurants_to_segments()
         self.__send_load_segment_beaubrun()
 
-        graph_repository = NeoGraphRepository(Config.NEO4J_CONNECTION_HOST, Config.NEO4J_PORT)
+        graph_repository = NeoGraphRepository(
+            Config.NEO4J_CONNECTION_HOST, Config.NEO4J_PORT
+        )
         route_repository = MongoRouteRepository(Config.MONGO_ADDRESS)
 
-        route_service = RouteService(restaurant_repository, graph_repository, route_repository)
+        route_service = RouteService(
+            restaurant_repository, graph_repository, route_repository
+        )
         route_service.generate_route()
         self.__application_server.run("0.0.0.0")
 

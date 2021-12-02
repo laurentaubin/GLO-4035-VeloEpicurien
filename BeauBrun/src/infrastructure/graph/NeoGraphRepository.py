@@ -134,7 +134,7 @@ class NeoGraphRepository:
             longitude=str(restaurant.get_coordinates().get_longitude()),
             restaurant_id=restaurant.get_id(),
             types=restaurant.get_types(),
-            name=restaurant.get_name()
+            name=restaurant.get_name(),
         )
         self.__graph_client.create(restaurant_node)
 

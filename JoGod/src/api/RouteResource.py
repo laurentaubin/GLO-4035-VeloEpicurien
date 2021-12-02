@@ -18,5 +18,6 @@ class RouteResource:
         number_of_stops: int = body["numberOfStops"]
         length: int = body["length"]
 
-        return self.__route_service.generate_route(starting_point, restaurant_types, number_of_stops, length)
-
+        return self.__route_service.generate_route(
+            starting_point, restaurant_types, number_of_stops, length
+        )
