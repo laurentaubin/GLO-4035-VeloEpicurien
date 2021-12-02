@@ -63,7 +63,7 @@ services:
     hostname: neo4j_epicurien
     volumes:
       - ./neo4j/plugins:/plugins
-      - ./neo4j/data:/data
+      - ./neo4j/data_resto:/data
     environment:
       NEO4J_AUTH: none
       NEO4J_dbms_logs_debug_level: DEBUG

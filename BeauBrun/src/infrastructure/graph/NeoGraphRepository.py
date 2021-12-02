@@ -134,6 +134,7 @@ class NeoGraphRepository:
             longitude=str(restaurant.get_coordinates().get_longitude()),
             restaurant_id=restaurant.get_id(),
             types=restaurant.get_types(),
+            name=restaurant.get_name()
         )
         self.__graph_client.create(restaurant_node)
 
@@ -157,7 +158,7 @@ class NeoGraphRepository:
                 self.__graph_client.create(
                     Relationship(
                         restaurant_node,
-                        "on_path",
+                        "link_to",
                         vertex_closest_to_restaurant,
                         distance=min_distance_with_restaurant,
                     )

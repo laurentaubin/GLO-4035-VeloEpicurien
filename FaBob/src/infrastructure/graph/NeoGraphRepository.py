@@ -26,46 +26,34 @@ class NeoGraphRepository(GraphRepository):
                 pass
 
     def generate_routes_resto_to_resto(self):
+        restaurant_counter = 0
         generated_path = []
-        max_number_of_path_per_vertex = 5
-        path_counter = 0
 
-        vertex_nodes = []
-        vertexes_table = self.__graph_client.run("MATCH (r:Restaurant) RETURN r").to_table()
-        for vertex_entry in vertexes_table:
-            vertex_nodes.append(vertex_entry[0])
+        restaurants_nodes = []
+        restaurants_table = self.__graph_client.run("MATCH (r:Restaurant) RETURN r").to_table()
+        for restaurant_entry in restaurants_table:
+            restaurants_nodes.append(restaurant_entry[0])
 
-        number_of_vertexes = len(vertex_nodes)
+        number_of_restaurants = len(restaurants_nodes)
 
-        for restaurant in vertex_nodes:
-
-            vertex_node = vertex_nodes[index]
-            index += 1000
-            already_generated_path = set()
-            while path_counter < max_number_of_path_per_vertex:
-                if path_counter >= max_number_of_path_per_vertex:
-                    break
-                another_vertex_node_index = random.randint(0, number_of_vertexes)
-                another_vertex_node = vertex_nodes[another_vertex_node_index]
-
-                if another_vertex_node in already_generated_path or self.__are_equals(vertex_node, another_vertex_node):
+        for restaurant_node in restaurants_nodes:
+            for another_restaurant_node in restaurants_nodes:
+                if restaurant_node["restaurant_id"] == another_restaurant_node["restaurant_id"]:
                     pass
-
-                already_generated_path.add(another_vertex_node)
-
-                distance_between_vertexes = 0
-                vertex_nodes_in_path_result = None
+                distance_between_restaurants = 0
+                vertex_nodes_in_path_result = []
 
                 try:
-                    query_result = self.__query_path_and_distance_between_vertex_nodes(vertex_node,
-                                                                                       another_vertex_node).to_table()
-                    distance_between_vertexes = query_result[0][0]
+                    query_result = self.__query_path_and_distance_between_vertex_nodes(restaurant_node,
+                                                                                       another_restaurant_node).to_table()
+                    distance_between_restaurants = query_result[0][0]
                     vertex_nodes_in_path_result = query_result[0][2]
-                except Exception:
+                except Exception as err:
+                    # print("ERROR: ", err)
                     pass
+                if self.__is_in_length_range(distance_between_restaurants):
+                    print("DISTANCE BETWEEN RESTAURANTS: ", distance_between_restaurants)
 
-                if self.__is_in_length_range(distance_between_vertexes):
-                    path_counter += 1
                     route_coordinates = []
 
                     for vertex_node_in_path in vertex_nodes_in_path_result:
@@ -75,17 +63,19 @@ class NeoGraphRepository(GraphRepository):
                     restaurant_nodes = self.__query_restaurant_nodes_on_path(vertex_nodes_in_path_result)
                     restaurants = []
                     for restaurant_node in restaurant_nodes:
-                        coordinates = [restaurant_node["longitude"], restaurant_node["latitude"]]
+                        coordinates = [float(restaurant_node["longitude"]), float(restaurant_node["latitude"])]
                         types = restaurant_node["types"]
                         restaurant_id = restaurant_node["restaurant_id"]
+                        name = restaurant_node["name"]
                         restaurants.append(
-                            {"restaurant_id": restaurant_id, "types": types, "coordinates": coordinates})
-
-                    generated_path.append({"route_coordinates": route_coordinates, "restaurants": restaurants})
-                    print("PATH ADDED: ", path_counter, "/", max_number_of_path_per_vertex, ", DISTANCE: ",
-                          distance_between_vertexes)
-            print("\nONE VERTEX DONE, RESET PATH COUNTER FOR NEW VERTEX")
-            path_counter = 0
+                            {"restaurant_id": restaurant_id, "types": types, "coordinates": coordinates, "name": name})
+                    route = {"route_coordinates": route_coordinates, "restaurants": restaurants,
+                             "length": distance_between_restaurants,
+                             "starting_point": [float(restaurant_node["longitude"]),
+                                                float(restaurant_node["latitude"])]}
+                    generated_path.append(route)
+            print("ONE RESTAURANT DONE: ", restaurant_counter, "/", number_of_restaurants)
+            break
         return generated_path
 
     def generate_routes(self):
@@ -162,9 +152,10 @@ class NeoGraphRepository(GraphRepository):
         #     end_node[
         #         "longitude"]) + "' WITH p, length(p) AS count ORDER BY count LIMIT 1 WITH p, relationships(p) as roads WITH p, reduce(d=0, r in roads | d + r.distance) as distance RETURN distance, round(distance) as rounded, nodes(p) as nodes"
 
-        real_query = "MATCH p=shortestPath((resto1:Restaurant)-[:on_path]->(:Vertex)-[r:link_to*]->(:Vertex)<-[:on_path]-(resto2:Restaurant)) WHERE resto1.restaurant_id='" + str(
+        real_query = "MATCH p=shortestPath((resto1:Restaurant)-[r:link_to*]-(resto2:Restaurant)) WHERE resto1.restaurant_id='" + str(
             starting_node["restaurant_id"]) + "' AND resto2.restaurant_id='" + str(
-            end_node["restaurant_id"]) + "' WITH p, length(p) AS count ORDER BY count LIMIT 1 WITH p, relationships(p) as roads WITH p, reduce(d=0, r in roads | d + r.distance) as distance RETURN distance, round(distance) as rounded, nodes(p) as nodes"
+            end_node[
+                "restaurant_id"]) + "' WITH p, length(p) AS count ORDER BY count LIMIT 1 WITH p, relationships(p) as roads WITH p, reduce(d=0, r in roads | d + r.distance) as distance RETURN distance, round(distance) as rounded, nodes(p) as nodes"
 
         return self.__graph_client.run(
             real_query)
@@ -181,7 +172,7 @@ class NeoGraphRepository(GraphRepository):
     def __query_restaurant_nodes_on_path(self, vertex_nodes: List[Node]):
         restaurant_nodes = set()
         for vertex_node in vertex_nodes:
-            query = "MATCH (restaurant: Restaurant)-[:on_path]->(vertex:Vertex {" + self.__get_vertex_node_attributes(
+            query = "MATCH (restaurant: Restaurant)-[:link_to]->(vertex:Vertex {" + self.__get_vertex_node_attributes(
                 vertex_node) + "}) RETURN collect(distinct(restaurant))"
             result = self.__graph_client.run(query).to_table()
             for restaurant_node in result[0][0]:
@@ -189,4 +180,4 @@ class NeoGraphRepository(GraphRepository):
         return restaurant_nodes
 
     def __is_in_length_range(self, length: float):
-        return 5000 * 0.9 <= length <= 5000 * 1.1 or 7500 * 0.9 <= length <= 7500 * 1.1 or 10000 * 0.9 <= length <= 10000 * 1.1 or 12000 * 0.9 <= length <= 12000 * 1.1 or 8000 * 0.9 <= length <= 8000 * 1100 or 15000 * 0.9 <= length <= 15000 * 1.1
+        return 5000 * 0.9 <= length <= 5000 * 1.1 or 7500 * 0.9 <= length <= 7500 * 1.1 or 10000 * 0.9 <= length <= 10000 * 1.1 or 12000 * 0.9 <= length <= 12000 * 1.1 or 8000 * 0.9 <= length <= 8000 * 1.1 or 15000 * 0.9 <= length <= 15000 * 1.1

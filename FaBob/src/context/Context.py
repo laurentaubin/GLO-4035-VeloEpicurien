@@ -6,10 +6,12 @@ import requests
 
 from api.LoaderResource import LoaderResource
 from config import Config
+from domain.route.RouteRepository import RouteRepository
 from infrastructure.graph.NeoGraphRepository import NeoGraphRepository
 from infrastructure.restaurant.MongoRestaurantRepository import (
     MongoRestaurantRepository,
 )
+from infrastructure.route.MongoRouteRepository import MongoRouteRepository
 from infrastructure.segment.MongoSegmentRepository import MongoSegmentRepository
 from server.ApplicationServer import ApplicationServer
 from service.ConnectorService import ConnectorService
@@ -38,8 +40,9 @@ class Context:
         self.__send_load_segment_beaubrun()
 
         graph_repository = NeoGraphRepository(Config.NEO4J_CONNECTION_HOST, Config.NEO4J_PORT)
+        route_repository = MongoRouteRepository(Config.MONGO_ADDRESS)
 
-        route_service = RouteService(restaurant_repository, graph_repository)
+        route_service = RouteService(restaurant_repository, graph_repository, route_repository)
         route_service.generate_route()
         self.__application_server.run("0.0.0.0")
 
@@ -54,4 +57,3 @@ class Context:
             except Exception as err:
                 print("\nERROR WHILE SENDING REQUEST TO BEAUBRUN: {0}\n".format(err))
                 time.sleep(2)
-

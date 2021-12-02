@@ -4,3 +4,6 @@ class GraphRepository:
 
     def generate_routes(self):
         pass
+
+    def generate_routes_resto_to_resto(self):
+        pass
