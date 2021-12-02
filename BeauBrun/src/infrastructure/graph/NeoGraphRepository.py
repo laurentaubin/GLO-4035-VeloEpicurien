@@ -12,7 +12,7 @@ from domain.segment.Vertex import Vertex
 
 
 class NeoGraphRepository:
-    __MIN_DISTANCE_OUTSIDE_OFFICIAL_PATH = 25
+    __MIN_DISTANCE_OUTSIDE_OFFICIAL_PATH = 10
     __WIPE_COMMAND = "MATCH (n) DETACH DELETE n"
     __GET_ALL_VERTEXES = "MATCH (vertex:Vertex) RETURN vertex"
 

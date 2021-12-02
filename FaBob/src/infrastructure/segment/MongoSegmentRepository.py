@@ -34,7 +34,7 @@ class MongoSegmentRepository(SegmentRepository):
                                     "type": "Point",
                                     "coordinates": coordinates,
                                 },
-                                "$maxDistance": 25,
+                                "$maxDistance": 10,
                             }
                         }
                     }
@@ -66,7 +66,7 @@ class MongoSegmentRepository(SegmentRepository):
                                 coordinates.get_latitude(),
                             ],
                         },
-                        "$maxDistance": 500,
+                        "$maxDistance": 250,
                     }
                 }
             }

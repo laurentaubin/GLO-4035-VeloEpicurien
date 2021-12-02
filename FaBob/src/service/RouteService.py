@@ -8,7 +8,8 @@ class RouteService:
         self.__graph_repository = graph_repository
 
     def generate_route(self):
-        self.__graph_repository.generate_route()
+        generated_routes = self.__graph_repository.generate_routes()
+        print(generated_routes)
 
 
     def get_vertex_starting_point(self, latitude: float, longitude: float):
