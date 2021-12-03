@@ -8,10 +8,11 @@ class MongoRouteRepository(RouteRepository):
         self.__mongo_client = MongoClient(mongo_address)
         self.__database = self.__mongo_client.epicurien
         self.__routes_collection = self.__database["routes"]
-        self.__routes_collection.remove({})
+        # self.__routes_collection.remove({})
         self.__routes_collection.create_index(
             [("geometry", "2dsphere")], name="starting_point"
         )
+        self.__routes_collection.create_index("trajectory.properties.length", 1)
 
     def save_routes(self, routes: dict):
         for route in routes:

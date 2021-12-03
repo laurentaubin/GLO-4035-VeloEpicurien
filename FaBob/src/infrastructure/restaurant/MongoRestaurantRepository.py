@@ -14,7 +14,7 @@ class MongoRestaurantRepository(RestaurantRepository):
         self.__restaurant_data_filepath = restaurant_data_filepath
         self.__restaurants_database = self.__mongo_client.epicurien
         self.__restaurants_collection = self.__restaurants_database["restaurants"]
-        self.__restaurants_collection.remove({})
+        # self.__restaurants_collection.remove({})
 
     def load_restaurants(self) -> None:
         restaurants = self.__read_restaurant_data_file()

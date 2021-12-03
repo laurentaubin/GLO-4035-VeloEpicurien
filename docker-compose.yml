@@ -51,8 +51,8 @@ services:
     environment:
       MONGO_INITDB_DATABASE: epicurien
       MONGODB_DATA_DIR: /data/db
-#    volumes:
-#      - ./data/mongo_data:/data
+    volumes:
+      - ./data/mongo_data/db:/data/db
     ports:
       - "27017:27017"
 

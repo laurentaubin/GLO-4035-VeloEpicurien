@@ -1,3 +1,5 @@
+from typing import List
+
 from flask import Flask, request
 import markdown
 import markdown.extensions.fenced_code
@@ -39,6 +41,9 @@ class ApplicationServer:
             "/transformed_data", "transformed_data", self.__get_transformed_data
         )
         self.__app.add_url_rule("/type", "type", self.__get_restaurant_types)
+
+        self.__app.add_url_rule("/starting_point", "starting_point", self.__find_starting_point)
+
         self.__app.add_url_rule(
             "/parcours", "parcours", self.__get_parcours, methods=["POST"]
         )
@@ -59,8 +64,11 @@ class ApplicationServer:
     def __get_transformed_data(self) -> dict:
         return self.__transformed_data_resource.get_transformed_data()
 
-    def __get_restaurant_types(self) -> dict:
+    def __get_restaurant_types(self) -> List[str]:
         return self.__transformed_data_resource.get_restaurant_types()
+
+    def __find_starting_point(self) -> dict:
+        return self.__route_resource.find_starting_point(request)
 
     def __get_parcours(self) -> dict:
         return self.__route_resource.generate_route(request)

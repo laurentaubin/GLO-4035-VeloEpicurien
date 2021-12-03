@@ -10,6 +10,7 @@ from infrastructure.graph.NeoGraphRepository import NeoGraphRepository
 from infrastructure.restaurant.MongoRestaurantRepository import (
     MongoRestaurantRepository,
 )
+from infrastructure.route.MongoRouteRepository import MongoRouteRepository
 from infrastructure.segment.MongoSegmentRepository import MongoSegmentRepository
 from server.ApplicationServer import ApplicationServer
 from service.RouteService import RouteService
@@ -38,7 +39,9 @@ class Context:
             segment_repository, restaurant_repository
         )
 
-        route_service = RouteService(restaurant_repository, graph_repository)
+        route_repository = MongoRouteRepository(Config.MONGO_ADDRESS)
+
+        route_service = RouteService(restaurant_repository, graph_repository, route_repository)
         route_resource = RouteResource(route_service)
 
         return ApplicationServer(
@@ -50,15 +53,15 @@ class Context:
         )
 
     def __create_transformed_data_resource(
-        self,
-        segment_repository: SegmentRepository,
-        restaurant_repository: RestaurantRepository,
+            self,
+            segment_repository: SegmentRepository,
+            restaurant_repository: RestaurantRepository,
     ) -> TransformedDataResource:
         return TransformedDataResource(segment_repository, restaurant_repository)
 
     def __create_extracted_data_resource(
-        self,
-        segment_repository: SegmentRepository,
-        restaurant_repository: RestaurantRepository,
+            self,
+            segment_repository: SegmentRepository,
+            restaurant_repository: RestaurantRepository,
     ) -> ExtractedDataResource:
         return ExtractedDataResource(segment_repository, restaurant_repository)
