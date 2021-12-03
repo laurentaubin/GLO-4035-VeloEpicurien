@@ -26,6 +26,8 @@ class NeoGraphRepository(GraphRepository):
                 pass
 
     def generate_routes_resto_to_resto(self):
+        route_counter = 0
+        max_route_per_resto = 10
         restaurant_counter = 0
         generated_path = []
 
@@ -39,14 +41,14 @@ class NeoGraphRepository(GraphRepository):
         number_of_restaurants = len(restaurants_nodes)
 
         for restaurant_node in restaurants_nodes:
+            number_of_routes_generated = 0
+            start = time.time()
             for another_restaurant_node in restaurants_nodes:
-                if (
-                    restaurant_node["restaurant_id"]
-                    == another_restaurant_node["restaurant_id"]
-                ):
-                    pass
-                distance_between_restaurants = 0
-                vertex_nodes_in_path_result = []
+                if number_of_routes_generated >= max_route_per_resto:
+                    break
+
+                if restaurant_node["restaurant_id"] == another_restaurant_node["restaurant_id"]:
+                    continue
 
                 try:
                     query_result = self.__query_path_and_distance_between_vertex_nodes(
@@ -54,9 +56,10 @@ class NeoGraphRepository(GraphRepository):
                     ).to_table()
                     distance_between_restaurants = query_result[0][0]
                     vertex_nodes_in_path_result = query_result[0][2]
-                except Exception as err:
-                    # print("ERROR: ", err)
-                    pass
+
+                except Exception:
+                    continue
+
                 if self.__is_in_length_range(distance_between_restaurants):
                     print(
                         "DISTANCE BETWEEN RESTAURANTS: ", distance_between_restaurants
@@ -65,6 +68,9 @@ class NeoGraphRepository(GraphRepository):
                     route_coordinates = []
 
                     for vertex_node_in_path in vertex_nodes_in_path_result:
+                        if "segment_id" not in vertex_node_in_path:
+                            continue
+
                         route_coordinates.append(
                             [
                                 float(vertex_node_in_path["longitude"]),
@@ -102,10 +108,13 @@ class NeoGraphRepository(GraphRepository):
                         ],
                     }
                     generated_path.append(route)
+                    route_counter += 1
+                    number_of_routes_generated += 1
+            restaurant_counter += 1
             print(
-                "ONE RESTAURANT DONE: ", restaurant_counter, "/", number_of_restaurants
+                "ONE RESTAURANT DONE: ", restaurant_counter, "/", number_of_restaurants, " (", time.time() - start,
+                " sec)"
             )
-            break
         return generated_path
 
     def generate_routes(self):
@@ -131,9 +140,9 @@ class NeoGraphRepository(GraphRepository):
                 another_vertex_node = vertex_nodes[another_vertex_node_index]
 
                 if another_vertex_node in already_generated_path or self.__are_equals(
-                    vertex_node, another_vertex_node
+                        vertex_node, another_vertex_node
                 ):
-                    pass
+                    continue
 
                 already_generated_path.add(another_vertex_node)
 
@@ -147,13 +156,21 @@ class NeoGraphRepository(GraphRepository):
                     distance_between_vertexes = query_result[0][0]
                     vertex_nodes_in_path_result = query_result[0][2]
                 except Exception:
-                    pass
+                    continue
 
                 if self.__is_in_length_range(distance_between_vertexes):
                     path_counter += 1
                     route_coordinates = []
 
                     for vertex_node_in_path in vertex_nodes_in_path_result:
+                        print("RESTO ID: ", vertex_node_in_path["restaurant_id"])
+
+                        try:
+                            vertex_node_in_path["segment_id"]
+                        except Exception:
+                            print("is a resto")
+                            continue
+
                         route_coordinates.append(
                             [
                                 float(vertex_node_in_path["longitude"]),
@@ -202,7 +219,7 @@ class NeoGraphRepository(GraphRepository):
         return {}
 
     def __query_path_and_distance_between_vertex_nodes(
-        self, starting_node: Node, end_node: Node
+            self, starting_node: Node, end_node: Node
     ):
         # real_query = "MATCH p=shortestPath((resto1:Restaurant)-[:on_path]->(v1:Vertex)-[r:link_to*]->(v2:Vertex)<-[:on_path]-(resto2:Restaurant)) WHERE v1.segment_id='" + str(
         #     starting_node["segment_id"]) + "' AND v1.latitude='" + str(
@@ -213,39 +230,39 @@ class NeoGraphRepository(GraphRepository):
         #         "longitude"]) + "' WITH p, length(p) AS count ORDER BY count LIMIT 1 WITH p, relationships(p) as roads WITH p, reduce(d=0, r in roads | d + r.distance) as distance RETURN distance, round(distance) as rounded, nodes(p) as nodes"
 
         real_query = (
-            "MATCH p=shortestPath((resto1:Restaurant)-[r:link_to*]-(resto2:Restaurant)) WHERE resto1.restaurant_id='"
-            + str(starting_node["restaurant_id"])
-            + "' AND resto2.restaurant_id='"
-            + str(end_node["restaurant_id"])
-            + "' WITH p, length(p) AS count ORDER BY count LIMIT 1 WITH p, relationships(p) as roads WITH p, reduce(d=0, r in roads | d + r.distance) as distance RETURN distance, round(distance) as rounded, nodes(p) as nodes"
+                "MATCH p=shortestPath((resto1:Restaurant)-[r:link_to*]-(resto2:Restaurant)) WHERE resto1.restaurant_id='"
+                + str(starting_node["restaurant_id"])
+                + "' AND resto2.restaurant_id='"
+                + str(end_node["restaurant_id"])
+                + "' WITH p, length(p) AS count ORDER BY count LIMIT 1 WITH p, relationships(p) as roads WITH p, reduce(d=0, r in roads | d + r.distance) as distance RETURN distance, round(distance) as rounded, nodes(p) as nodes"
         )
 
         return self.__graph_client.run(real_query)
 
     def __get_vertex_node_attributes(self, node: Node):
         return (
-            "segment_id:'"
-            + str(node["segment_id"])
-            + "', latitude:'"
-            + str(node["latitude"])
-            + "', longitude:'"
-            + str(node["longitude"] + "'")
+                "segment_id:'"
+                + str(node["segment_id"])
+                + "', latitude:'"
+                + str(node["latitude"])
+                + "', longitude:'"
+                + str(node["longitude"] + "'")
         )
 
     def __are_equals(self, vertex_node: Node, another_vertex_node: Node):
         return (
-            vertex_node["segment_id"] == another_vertex_node["segment_id"]
-            and vertex_node["latitude"] == another_vertex_node["latitude"]
-            and vertex_node["longitude"] == another_vertex_node["longitude"]
+                vertex_node["segment_id"] == another_vertex_node["segment_id"]
+                and vertex_node["latitude"] == another_vertex_node["latitude"]
+                and vertex_node["longitude"] == another_vertex_node["longitude"]
         )
 
     def __query_restaurant_nodes_on_path(self, vertex_nodes: List[Node]):
         restaurant_nodes = set()
         for vertex_node in vertex_nodes:
             query = (
-                "MATCH (restaurant: Restaurant)-[:link_to]->(vertex:Vertex {"
-                + self.__get_vertex_node_attributes(vertex_node)
-                + "}) RETURN collect(distinct(restaurant))"
+                    "MATCH (restaurant: Restaurant)-[:link_to]->(vertex:Vertex {"
+                    + self.__get_vertex_node_attributes(vertex_node)
+                    + "}) RETURN collect(distinct(restaurant))"
             )
             result = self.__graph_client.run(query).to_table()
             for restaurant_node in result[0][0]:
@@ -254,10 +271,10 @@ class NeoGraphRepository(GraphRepository):
 
     def __is_in_length_range(self, length: float):
         return (
-            5000 * 0.9 <= length <= 5000 * 1.1
-            or 7500 * 0.9 <= length <= 7500 * 1.1
-            or 10000 * 0.9 <= length <= 10000 * 1.1
-            or 12000 * 0.9 <= length <= 12000 * 1.1
-            or 8000 * 0.9 <= length <= 8000 * 1.1
-            or 15000 * 0.9 <= length <= 15000 * 1.1
+                5000 * 0.9 <= length <= 5000 * 1.1
+                or 7500 * 0.9 <= length <= 7500 * 1.1
+                or 10000 * 0.9 <= length <= 10000 * 1.1
+                or 12000 * 0.9 <= length <= 12000 * 1.1
+                or 8000 * 0.9 <= length <= 8000 * 1.1
+                or 15000 * 0.9 <= length <= 15000 * 1.1
         )

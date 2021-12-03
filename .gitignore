@@ -8,8 +8,13 @@
 
 # Database volumes
 mongo-volume/*
+data/mongo_data
+data/data_resto
+data/data_neo
+data/data_neo_v1
 neo4j/data/
 neo4j/data_resto
+
 
 # User-specific stuff
 .idea/**/workspace.xml

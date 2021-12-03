@@ -34,9 +34,11 @@ class Context:
         loader_resource = LoaderResource(restaurant_repository, segment_repository)
         loader_resource.load_segments()
         loader_resource.load_restaurants()
-        ConnectorService(
+        connector_service = ConnectorService(
             restaurant_repository, segment_repository
-        ).connect_near_restaurants_to_segments()
+        )
+
+        connector_service.connect_near_restaurants_to_segments()
         self.__send_load_segment_beaubrun()
 
         graph_repository = NeoGraphRepository(

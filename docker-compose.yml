@@ -51,8 +51,8 @@ services:
     environment:
       MONGO_INITDB_DATABASE: epicurien
       MONGODB_DATA_DIR: /data/db
-    volumes:
-      - ./mongo-volume:/data/db
+#    volumes:
+#      - ./data/mongo_data:/data
     ports:
       - "27017:27017"
 
@@ -63,7 +63,7 @@ services:
     hostname: neo4j_epicurien
     volumes:
       - ./neo4j/plugins:/plugins
-      - ./neo4j/data_resto:/data
+      - ./data/data_neo:/data
     environment:
       NEO4J_AUTH: none
       NEO4J_dbms_logs_debug_level: DEBUG

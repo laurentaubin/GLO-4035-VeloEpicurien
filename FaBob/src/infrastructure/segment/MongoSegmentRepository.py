@@ -71,8 +71,10 @@ class MongoSegmentRepository(SegmentRepository):
                 }
             }
         )
+
         for near_segment in near_segments_doc:
             near_segments.add(near_segment["segment_id"])
+            break
         near_segments = list(near_segments)
         return near_segments
 

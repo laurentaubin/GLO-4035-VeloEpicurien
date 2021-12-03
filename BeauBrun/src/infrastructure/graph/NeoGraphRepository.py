@@ -85,7 +85,7 @@ class NeoGraphRepository:
             if near_segment_id in self.__connected_segments:
                 if source_segment_id in self.__connected_segments.get(near_segment_id):
                     number_of_fetch_saved += 1
-                    pass
+                    continue
             near_segment_vertexes_result = self.__fetch_segment_vertexes_by_id(
                 near_segment_id
             )
