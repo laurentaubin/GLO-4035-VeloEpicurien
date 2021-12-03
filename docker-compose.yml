@@ -52,7 +52,7 @@ services:
       MONGO_INITDB_DATABASE: epicurien
       MONGODB_DATA_DIR: /data/db
     volumes:
-      - ./data/mongo_data/db:/data/db
+      - ./data/data_mongo_route_with_types/db:/data/db
     ports:
       - "27017:27017"
 

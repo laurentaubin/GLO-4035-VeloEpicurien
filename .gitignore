@@ -12,6 +12,7 @@ data/mongo_data
 data/data_resto
 data/data_neo
 data/mongo_data_backup
+data/data_mongo_route_with_types
 data/data_neo_v1
 neo4j/data/
 neo4j/data_resto

@@ -18,7 +18,7 @@ class RouteService:
 
     def find_starting_point(self, length: int, types: List[str]):
         return {
-            "starting_point": self.__route_repository.find_starting_point(length, types)["geometry"]}
+            "startingPoint": self.__route_repository.find_starting_point(length, types)["geometry"]}
 
     def generate_route(
             self, starting_point: dict, type: List[str], number_of_stops: int, length: int

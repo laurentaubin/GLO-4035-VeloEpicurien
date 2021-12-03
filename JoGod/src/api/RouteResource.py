@@ -12,7 +12,6 @@ class RouteResource:
         body = request.get_json()
         if not body:
             return {"error": "bad request", "description": "missing body"}
-        print(body["length"])
         length: int = int(body["length"])
         desired_types: List[str] = body["type"]
 
