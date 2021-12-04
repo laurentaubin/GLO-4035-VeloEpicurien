@@ -38,7 +38,9 @@ class MongoRouteRepository(RouteRepository):
                 for restaurant_type in restaurant["properties"]["type"]:
                     restaurant_types_in_route.add(restaurant_type)
             doc_id = doc["_id"]
-            self.__routes_collection.update({"_id": doc_id}, {"$set": {"types": list(restaurant_types_in_route)}})
+            self.__routes_collection.update(
+                {"_id": doc_id}, {"$set": {"types": list(restaurant_types_in_route)}}
+            )
 
     def __assemble_trajectory_feature(self, route_coordinates, length):
         return {

@@ -136,7 +136,7 @@ class NeoGraphRepository:
                 restaurant_id=restaurant.get_id(),
                 types=restaurant.get_types(),
                 name=restaurant.get_name(),
-                near_segments=restaurant.get_near_segments()
+                near_segments=restaurant.get_near_segments(),
             )
             self.__graph_client.create(restaurant_node)
 

@@ -15,12 +15,12 @@ from service.RouteService import RouteService
 
 class ApplicationServer:
     def __init__(
-            self,
-            heartbeat_resource: HeartbeatResource,
-            readme_resource: ReadMeResource,
-            extracted_data_resource: ExtractedDataResource,
-            transformed_data_resource: TransformedDataResource,
-            route_resource: RouteResource,
+        self,
+        heartbeat_resource: HeartbeatResource,
+        readme_resource: ReadMeResource,
+        extracted_data_resource: ExtractedDataResource,
+        transformed_data_resource: TransformedDataResource,
+        route_resource: RouteResource,
     ):
         self.__heartbeat_resource = heartbeat_resource
         self.__readme_resource = readme_resource
@@ -42,11 +42,11 @@ class ApplicationServer:
         )
         self.__app.add_url_rule("/type", "type", self.__get_restaurant_types)
 
-        self.__app.add_url_rule("/starting_point", "starting_point", self.__find_starting_point)
-
         self.__app.add_url_rule(
-            "/parcours", "parcours", self.__get_parcours
+            "/starting_point", "starting_point", self.__find_starting_point
         )
+
+        self.__app.add_url_rule("/parcours", "parcours", self.__get_parcours)
 
     def run(self, hostname) -> None:
         self.__app.run(hostname)

@@ -27,9 +27,7 @@ class RouteResource:
 
         schema = {
             "type": "object",
-            "properties": {
-                "type": {"type": "array"}
-            },
+            "properties": {"type": {"type": "array"}},
         }
 
         try:
