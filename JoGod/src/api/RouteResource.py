@@ -127,7 +127,7 @@ class RouteResource:
                 break
 
         if error_message == "":
-            return make_response("2132131232", 200)
+            return make_response("", 200)
 
         return make_response(error_message, 404)
 
