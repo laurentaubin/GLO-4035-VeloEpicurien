@@ -44,7 +44,7 @@ class Context:
         route_service = RouteService(
             restaurant_repository, graph_repository, route_repository
         )
-        route_resource = RouteResource(route_service)
+        route_resource = RouteResource(route_service, restaurant_repository)
 
         return ApplicationServer(
             heartbeat_resource,
