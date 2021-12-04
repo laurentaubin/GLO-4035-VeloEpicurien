@@ -14,7 +14,6 @@ class MongoSegmentRepository(SegmentRepository):
         self.__segment_data_filepath = segment_data_filepath
         self.__segments_database = self.__mongo_client.epicurien
         self.__segments_collection = self.__segments_database["segments"]
-        # self.__segments_collection.remove({})
         self.__segments_collection.create_index(
             [("geometry", "2dsphere")], name="geometry"
         )

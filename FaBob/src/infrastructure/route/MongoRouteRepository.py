@@ -8,11 +8,9 @@ class MongoRouteRepository(RouteRepository):
         self.__mongo_client = MongoClient(mongo_address)
         self.__database = self.__mongo_client.epicurien
         self.__routes_collection = self.__database["routes"]
-        # self.__routes_collection.remove({})
         self.__routes_collection.create_index(
             [("geometry", "2dsphere")], name="starting_point"
         )
-        self.__routes_collection.create_index("trajectory.properties.length", 1)
 
     def save_routes(self, routes: dict):
         for route in routes:
@@ -30,6 +28,17 @@ class MongoRouteRepository(RouteRepository):
                     "starting_point": starting_point,
                 }
             )
+
+    def add_types(self):
+        cursor = self.__routes_collection.find()
+        for doc in cursor:
+            restaurant_types_in_route = set()
+            restaurants = doc["restaurants"]
+            for restaurant in restaurants:
+                for restaurant_type in restaurant["properties"]["type"]:
+                    restaurant_types_in_route.add(restaurant_type)
+            doc_id = doc["_id"]
+            self.__routes_collection.update({"_id": doc_id}, {"$set": {"types": list(restaurant_types_in_route)}})
 
     def __assemble_trajectory_feature(self, route_coordinates, length):
         return {

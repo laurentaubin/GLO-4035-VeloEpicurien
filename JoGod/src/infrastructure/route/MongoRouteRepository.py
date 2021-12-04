@@ -12,8 +12,34 @@ class MongoRouteRepository(RouteRepository):
         self.__database = self.__mongo_client.epicurien
         self.__routes_collection = self.__database["routes"]
         self.__routes_collection.create_index([("trajectory.properties.length", -1)])
+        self.__cache = []
 
     def find_starting_point(self, length: int, types: List[str]):
+        route_documents = self.__find_routes_matching_length_and_types(length, types)
+        random_route = random.choice(route_documents)
+        return random_route["starting_point"]
+
+    def find_route(self, starting_point: dict, types: List[str], length: int, number_of_stops: int):
+        route_documents = self.__find_routes_matching_length_and_types(length, types)
+        random_route = random.choice(route_documents)
+
+        desired_restaurants = self.__extract_desired_restaurants(types, random_route["restaurants"], number_of_stops)
+        random_route["restaurants"] = desired_restaurants
+
+        return random_route
+
+    def add_types(self):
+        cursor = self.__routes_collection.find()
+        for doc in cursor:
+            restaurant_types_in_route = set()
+            restaurants = doc["restaurants"]
+            for restaurant in restaurants:
+                for restaurant_type in restaurant["properties"]["type"]:
+                    restaurant_types_in_route.add(restaurant_type)
+            doc_id = doc["_id"]
+            self.__routes_collection.update({"_id": doc_id}, {"$set": {"types": list(restaurant_types_in_route)}})
+
+    def __find_routes_matching_length_and_types(self, length, types):
         route_documents = []
         if len(types) == 0:
             cursor = self.__routes_collection.find(
@@ -24,17 +50,15 @@ class MongoRouteRepository(RouteRepository):
                  "types": {"$all": types}})
         for document in cursor:
             route_documents.append(document)
+        return route_documents
 
-        random_route = random.choice(route_documents)
-        return random_route["starting_point"]
+    def __extract_desired_restaurants(self, types: List[str], restaurants, number_of_stops) -> List[dict]:
+        desired_restaurants = []
+        for restaurant in restaurants:
+            if not set(restaurant["properties"]["type"]).isdisjoint(types):
+                desired_restaurants.append(restaurant)
 
-    def find_starting_point_with_types(self):
-        cursor = self.__routes_collection.find()
-        for doc in cursor:
-            restaurant_types_in_route = set()
-            restaurants = doc["restaurants"]
-            for restaurant in restaurants:
-                for restaurant_type in restaurant["properties"]["type"]:
-                    restaurant_types_in_route.add(restaurant_type)
-            doc_id = doc["_id"]
-            self.__routes_collection.update({"_id": doc_id}, {"$set": {"types": list(restaurant_types_in_route)}})
+        if len(desired_restaurants) <= number_of_stops:
+            return desired_restaurants
+        return random.sample(desired_restaurants,
+                             number_of_stops)

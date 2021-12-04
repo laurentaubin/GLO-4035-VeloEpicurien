@@ -21,10 +21,9 @@ class RouteService:
             "startingPoint": self.__route_repository.find_starting_point(length, types)["geometry"]}
 
     def generate_route(
-            self, starting_point: dict, type: List[str], number_of_stops: int, length: int
+            self, starting_point: dict, types: List[str], number_of_stops: int, length: int
     ):
-        starting_vertex_node = self.__graph_repository.get_starting_vertex_node(
-            starting_point
-        )
+        return self.__route_repository.find_route(starting_point, types, length, number_of_stops)
 
-        pass
+    def add_types_to_routes(self):
+        self.__route_repository.add_types()

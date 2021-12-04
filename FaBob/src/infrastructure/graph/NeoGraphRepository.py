@@ -25,9 +25,9 @@ class NeoGraphRepository(GraphRepository):
                 logging.warning("ERROR CONNECTING TO NEO: {0}, TRYING AGAIN".format(e))
                 pass
 
-    def generate_routes_resto_to_resto(self):
+    def generate_routes(self):
         route_counter = 0
-        max_route_per_resto = 10
+        max_route_per_resto = 20
         restaurant_counter = 0
         generated_path = []
 
@@ -43,9 +43,16 @@ class NeoGraphRepository(GraphRepository):
         for restaurant_node in restaurants_nodes:
             number_of_routes_generated = 0
             start = time.time()
-            for another_restaurant_node in restaurants_nodes:
+            cache = []
+
+            for _ in restaurants_nodes:
                 if number_of_routes_generated >= max_route_per_resto:
                     break
+
+                another_restaurant_node = restaurants_nodes[random.randint(0, len(restaurants_nodes) - 1)]
+
+                if another_restaurant_node["restaurant_id"] in cache:
+                    continue
 
                 if restaurant_node["restaurant_id"] == another_restaurant_node["restaurant_id"]:
                     continue
@@ -66,30 +73,32 @@ class NeoGraphRepository(GraphRepository):
                     )
 
                     route_coordinates = []
+                    restaurant_nodes_on_path = set()
 
-                    for vertex_node_in_path in vertex_nodes_in_path_result:
-                        if "segment_id" not in vertex_node_in_path:
+                    for node in vertex_nodes_in_path_result:
+                        if "segment_id" not in node:
+                            restaurant_nodes_on_path.add(node)
                             continue
 
                         route_coordinates.append(
                             [
-                                float(vertex_node_in_path["longitude"]),
-                                float(vertex_node_in_path["latitude"]),
+                                float(node["longitude"]),
+                                float(node["latitude"]),
                             ]
                         )
 
-                    restaurant_nodes = self.__query_restaurant_nodes_on_path(
-                        vertex_nodes_in_path_result
-                    )
+                    # restaurant_nodes_on_path = self.__query_restaurant_nodes_on_path(
+                    #     vertex_nodes_in_path_result
+                    # )
                     restaurants = []
-                    for restaurant_node in restaurant_nodes:
+                    for restaurant_node_on_path in restaurant_nodes_on_path:
                         coordinates = [
-                            float(restaurant_node["longitude"]),
-                            float(restaurant_node["latitude"]),
+                            float(restaurant_node_on_path["longitude"]),
+                            float(restaurant_node_on_path["latitude"]),
                         ]
-                        types = restaurant_node["types"]
-                        restaurant_id = restaurant_node["restaurant_id"]
-                        name = restaurant_node["name"]
+                        types = restaurant_node_on_path["types"]
+                        restaurant_id = restaurant_node_on_path["restaurant_id"]
+                        name = restaurant_node_on_path["name"]
                         restaurants.append(
                             {
                                 "restaurant_id": restaurant_id,
@@ -115,104 +124,6 @@ class NeoGraphRepository(GraphRepository):
                 "ONE RESTAURANT DONE: ", restaurant_counter, "/", number_of_restaurants, " (", time.time() - start,
                 " sec)"
             )
-        return generated_path
-
-    def generate_routes(self):
-        generated_path = []
-        max_number_of_path_per_vertex = 5
-        path_counter = 0
-
-        vertex_nodes = []
-        vertexes_table = self.__graph_client.run("MATCH (v:Vertex) RETURN v").to_table()
-        for vertex_entry in vertexes_table:
-            vertex_nodes.append(vertex_entry[0])
-
-        number_of_vertexes = len(vertex_nodes)
-
-        for index in range(number_of_vertexes):
-            vertex_node = vertex_nodes[index]
-            index += 1000
-            already_generated_path = set()
-            while path_counter < max_number_of_path_per_vertex:
-                if path_counter >= max_number_of_path_per_vertex:
-                    break
-                another_vertex_node_index = random.randint(0, number_of_vertexes)
-                another_vertex_node = vertex_nodes[another_vertex_node_index]
-
-                if another_vertex_node in already_generated_path or self.__are_equals(
-                        vertex_node, another_vertex_node
-                ):
-                    continue
-
-                already_generated_path.add(another_vertex_node)
-
-                distance_between_vertexes = 0
-                vertex_nodes_in_path_result = None
-
-                try:
-                    query_result = self.__query_path_and_distance_between_vertex_nodes(
-                        vertex_node, another_vertex_node
-                    ).to_table()
-                    distance_between_vertexes = query_result[0][0]
-                    vertex_nodes_in_path_result = query_result[0][2]
-                except Exception:
-                    continue
-
-                if self.__is_in_length_range(distance_between_vertexes):
-                    path_counter += 1
-                    route_coordinates = []
-
-                    for vertex_node_in_path in vertex_nodes_in_path_result:
-                        print("RESTO ID: ", vertex_node_in_path["restaurant_id"])
-
-                        try:
-                            vertex_node_in_path["segment_id"]
-                        except Exception:
-                            print("is a resto")
-                            continue
-
-                        route_coordinates.append(
-                            [
-                                float(vertex_node_in_path["longitude"]),
-                                float(vertex_node_in_path["latitude"]),
-                            ]
-                        )
-
-                    restaurant_nodes = self.__query_restaurant_nodes_on_path(
-                        vertex_nodes_in_path_result
-                    )
-                    restaurants = []
-                    for restaurant_node in restaurant_nodes:
-                        coordinates = [
-                            restaurant_node["longitude"],
-                            restaurant_node["latitude"],
-                        ]
-                        types = restaurant_node["types"]
-                        restaurant_id = restaurant_node["restaurant_id"]
-                        restaurants.append(
-                            {
-                                "restaurant_id": restaurant_id,
-                                "types": types,
-                                "coordinates": coordinates,
-                            }
-                        )
-
-                    generated_path.append(
-                        {
-                            "route_coordinates": route_coordinates,
-                            "restaurants": restaurants,
-                        }
-                    )
-                    print(
-                        "PATH ADDED: ",
-                        path_counter,
-                        "/",
-                        max_number_of_path_per_vertex,
-                        ", DISTANCE: ",
-                        distance_between_vertexes,
-                    )
-            print("\nONE VERTEX DONE, RESET PATH COUNTER FOR NEW VERTEX")
-            path_counter = 0
         return generated_path
 
     def get_vertex_starting_point(self, latitude: float, longitude: float):

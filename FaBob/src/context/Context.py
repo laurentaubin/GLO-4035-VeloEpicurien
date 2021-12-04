@@ -23,33 +23,33 @@ class Context:
         self.__application_server = self.__create_application_server()
 
     def run(self):
-        # restaurant_repository = MongoRestaurantRepository(
-        #     Config.MONGO_ADDRESS, Config.RESTAURANTS_FILE_PATH
-        # )
-        # segment_repository = MongoSegmentRepository(
-        #     Config.MONGO_ADDRESS,
-        #     Config.SEGMENTS_FILE_PATH,
-        # )
-        #
-        # loader_resource = LoaderResource(restaurant_repository, segment_repository)
-        # # loader_resource.load_segments()
-        # # loader_resource.load_restaurants()
-        # connector_service = ConnectorService(
-        #     restaurant_repository, segment_repository
-        # )
-        #
-        # connector_service.connect_near_restaurants_to_segments()
-        # self.__send_load_segment_beaubrun()
-        #
-        # graph_repository = NeoGraphRepository(
-        #     Config.NEO4J_CONNECTION_HOST, Config.NEO4J_PORT
-        # )
-        # route_repository = MongoRouteRepository(Config.MONGO_ADDRESS)
-        #
-        # route_service = RouteService(
-        #     restaurant_repository, graph_repository, route_repository
-        # )
-        # route_service.generate_route()
+        restaurant_repository = MongoRestaurantRepository(
+            Config.MONGO_ADDRESS, Config.RESTAURANTS_FILE_PATH
+        )
+        segment_repository = MongoSegmentRepository(
+            Config.MONGO_ADDRESS,
+            Config.SEGMENTS_FILE_PATH,
+        )
+
+        loader_resource = LoaderResource(restaurant_repository, segment_repository)
+        loader_resource.load_segments()
+        loader_resource.load_restaurants()
+        connector_service = ConnectorService(
+            restaurant_repository, segment_repository
+        )
+
+        connector_service.connect_near_restaurants_to_segments()
+        self.__send_load_segment_beaubrun()
+
+        graph_repository = NeoGraphRepository(
+            Config.NEO4J_CONNECTION_HOST, Config.NEO4J_PORT
+        )
+        route_repository = MongoRouteRepository(Config.MONGO_ADDRESS)
+
+        route_service = RouteService(
+            restaurant_repository, graph_repository, route_repository
+        )
+        route_service.generate_route()
         self.__application_server.run("0.0.0.0")
 
     def __create_application_server(self) -> ApplicationServer:

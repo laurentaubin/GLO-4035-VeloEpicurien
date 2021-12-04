@@ -15,10 +15,6 @@ class RouteService:
         self.__route_repository = route_repository
 
     def generate_route(self):
-        generated_routes = self.__graph_repository.generate_routes_resto_to_resto()
+        generated_routes = self.__graph_repository.generate_routes()
         self.__route_repository.save_routes(generated_routes)
-
-    def get_vertex_starting_point(self, latitude: float, longitude: float):
-        return {}
-        # vertex_starting_point = self.get_vertex_starting_point(latitude, longitude)
-        # return vertex_starting_point
+        self.__route_repository.add_types()
