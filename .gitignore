@@ -8,16 +8,9 @@
 
 # Database volumes
 mongo-volume/*
-data/mongo_data
-data/data_resto
-data/data_neo
-data/mongo_data_backup
-data/data_mongo_route_with_types
-data/data_neo_v1
-neo4j/data/
-neo4j/data_resto
-
-
+data/mongo
+data/neo
+data/__MACOSX
 
 # User-specific stuff
 .idea/**/workspace.xml

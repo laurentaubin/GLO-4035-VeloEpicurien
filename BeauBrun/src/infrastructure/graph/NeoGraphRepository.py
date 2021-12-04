@@ -128,41 +128,43 @@ class NeoGraphRepository:
         return number_of_fetch_saved
 
     def save_restaurant(self, restaurant: Restaurant):
-        restaurant_node = Node(
-            "Restaurant",
-            latitude=str(restaurant.get_coordinates().get_latitude()),
-            longitude=str(restaurant.get_coordinates().get_longitude()),
-            restaurant_id=restaurant.get_id(),
-            types=restaurant.get_types(),
-            name=restaurant.get_name(),
-        )
-        self.__graph_client.create(restaurant_node)
-
-        # For each segment, connect the restaurant to the nearest vertex
-        for segment_id in restaurant.get_near_segments():
-            vertex_closest_to_restaurant = None
-            min_distance_with_restaurant = float("inf")
-            near_segment_vertexes_result = self.__fetch_segment_vertexes_by_id(
-                segment_id
+        if len(restaurant.get_near_segments()) > 0:
+            restaurant_node = Node(
+                "Restaurant",
+                latitude=str(restaurant.get_coordinates().get_latitude()),
+                longitude=str(restaurant.get_coordinates().get_longitude()),
+                restaurant_id=restaurant.get_id(),
+                types=restaurant.get_types(),
+                name=restaurant.get_name(),
+                near_segments=restaurant.get_near_segments()
             )
-            near_vertexes_entries = near_segment_vertexes_result.to_table()
-            for near_vertex_node_entry in near_vertexes_entries:
-                vertex_node = near_vertex_node_entry[0]
-                vertex = self.__assemble_vertex(vertex_node)
-                distance = self.__calculate_distance(
-                    vertex.get_coordinate(), restaurant.get_coordinates()
+            self.__graph_client.create(restaurant_node)
+
+            # For each segment, connect the restaurant to the nearest vertex
+            for segment_id in restaurant.get_near_segments():
+                vertex_closest_to_restaurant = None
+                min_distance_with_restaurant = float("inf")
+                near_segment_vertexes_result = self.__fetch_segment_vertexes_by_id(
+                    segment_id
                 )
-                if distance < min_distance_with_restaurant:
-                    min_distance_with_restaurant = distance
-                    vertex_closest_to_restaurant = vertex_node
-                self.__graph_client.create(
-                    Relationship(
-                        restaurant_node,
-                        "link_to",
-                        vertex_closest_to_restaurant,
-                        distance=min_distance_with_restaurant,
+                near_vertexes_entries = near_segment_vertexes_result.to_table()
+                for near_vertex_node_entry in near_vertexes_entries:
+                    vertex_node = near_vertex_node_entry[0]
+                    vertex = self.__assemble_vertex(vertex_node)
+                    distance = self.__calculate_distance(
+                        vertex.get_coordinate(), restaurant.get_coordinates()
                     )
-                )
+                    if distance < min_distance_with_restaurant:
+                        min_distance_with_restaurant = distance
+                        vertex_closest_to_restaurant = vertex_node
+                    self.__graph_client.create(
+                        Relationship(
+                            restaurant_node,
+                            "link_to",
+                            vertex_closest_to_restaurant,
+                            distance=min_distance_with_restaurant,
+                        )
+                    )
 
     def __calculate_distance(
         self, first_coordinates: Coordinate, second_coordinates: Coordinate

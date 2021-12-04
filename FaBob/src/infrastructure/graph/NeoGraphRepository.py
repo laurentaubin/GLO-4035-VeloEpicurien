@@ -27,7 +27,7 @@ class NeoGraphRepository(GraphRepository):
 
     def generate_routes(self):
         route_counter = 0
-        max_route_per_resto = 20
+        max_route_per_resto = 10
         restaurant_counter = 0
         generated_path = []
 
@@ -38,14 +38,16 @@ class NeoGraphRepository(GraphRepository):
         for restaurant_entry in restaurants_table:
             restaurants_nodes.append(restaurant_entry[0])
 
-        number_of_restaurants = len(restaurants_nodes)
+        filtered_restaurants = [x for x in restaurants_nodes if len(x["near_segments"]) > 0]
 
-        for restaurant_node in restaurants_nodes:
+        number_of_restaurants = len(filtered_restaurants)
+
+        for restaurant_node in filtered_restaurants:
             number_of_routes_generated = 0
             start = time.time()
             cache = []
 
-            for _ in restaurants_nodes:
+            for _ in filtered_restaurants:
                 if number_of_routes_generated >= max_route_per_resto:
                     break
 
@@ -87,9 +89,6 @@ class NeoGraphRepository(GraphRepository):
                             ]
                         )
 
-                    # restaurant_nodes_on_path = self.__query_restaurant_nodes_on_path(
-                    #     vertex_nodes_in_path_result
-                    # )
                     restaurants = []
                     for restaurant_node_on_path in restaurant_nodes_on_path:
                         coordinates = [

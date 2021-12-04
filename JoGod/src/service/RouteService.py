@@ -24,6 +24,3 @@ class RouteService:
             self, starting_point: dict, types: List[str], number_of_stops: int, length: int
     ):
         return self.__route_repository.find_route(starting_point, types, length, number_of_stops)
-
-    def add_types_to_routes(self):
-        self.__route_repository.add_types()

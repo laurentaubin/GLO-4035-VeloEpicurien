@@ -60,7 +60,3 @@ class RouteResource:
             features.append(restaurant)
 
         return {"type": "FeatureCollection", "features": features}
-
-    def add_types_to_route(self):
-        self.__route_service.add_types_to_routes()
-        return "OK"
