@@ -14,7 +14,6 @@ class MongoSegmentRepository(SegmentRepository):
         self.__segment_data_filepath = segment_data_filepath
         self.__segments_database = self.__mongo_client.epicurien
         self.__segments_collection = self.__segments_database["segments"]
-        self.__segments_collection.remove({})
         self.__segments_collection.create_index(
             [("geometry", "2dsphere")], name="geometry"
         )
@@ -34,7 +33,7 @@ class MongoSegmentRepository(SegmentRepository):
                                     "type": "Point",
                                     "coordinates": coordinates,
                                 },
-                                "$maxDistance": 25,
+                                "$maxDistance": 10,
                             }
                         }
                     }
@@ -66,13 +65,15 @@ class MongoSegmentRepository(SegmentRepository):
                                 coordinates.get_latitude(),
                             ],
                         },
-                        "$maxDistance": 500,
+                        "$maxDistance": 250,
                     }
                 }
             }
         )
+
         for near_segment in near_segments_doc:
             near_segments.add(near_segment["segment_id"])
+            break
         near_segments = list(near_segments)
         return near_segments
 

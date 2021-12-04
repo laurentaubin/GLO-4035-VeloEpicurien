@@ -8,6 +8,9 @@
 
 # Database volumes
 mongo-volume/*
+data/mongo
+data/neo
+data/__MACOSX
 
 # User-specific stuff
 .idea/**/workspace.xml

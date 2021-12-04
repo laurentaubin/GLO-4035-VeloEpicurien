@@ -1,3 +1,6 @@
+import json
+from typing import List
+
 from domain.restaurant.RestaurantRepository import RestaurantRepository
 from domain.segment.SegmentRepository import SegmentRepository
 
@@ -17,5 +20,5 @@ class TransformedDataResource:
             "longueurCyclable": self.__segment_repository.get_total_segment_length(),
         }
 
-    def get_restaurant_types(self) -> dict:
-        return {"type": self.__restaurant_repository.get_restaurant_types()}
+    def get_restaurant_types(self) -> str:
+        return json.dumps(self.__restaurant_repository.get_restaurant_types())
