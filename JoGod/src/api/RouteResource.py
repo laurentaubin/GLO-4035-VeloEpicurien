@@ -8,7 +8,9 @@ from jsonschema import validate
 
 
 class RouteResource:
-    def __init__(self, route_service: RouteService, restaurant_repository: RestaurantRepository):
+    def __init__(
+        self, route_service: RouteService, restaurant_repository: RestaurantRepository
+    ):
         self.__route_service = route_service
         self.__restaurant_repository = restaurant_repository
 
@@ -130,5 +132,3 @@ class RouteResource:
             return make_response("", 200)
 
         return make_response(error_message, 404)
-
-
